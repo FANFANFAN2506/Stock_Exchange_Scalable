@@ -1,46 +1,10 @@
-from sqlalchemy import create_engine, Integer, Float, Column, String, ForeignKey, TEXT, CHAR, TIMESTAMP
-from sqlalchemy.orm import declarative_base
-
-
-def createTable(Base):
-
-    class Account(Base):
-        __tablename__ = 'account'
-
-        id = Column(Integer, primary_key=True, autoincrement=False)
-        Balance = Column(Float)
-
-    class Position(Base):
-        __tablename__ = 'position'
-
-        uid = Column(Integer, ForeignKey('account.id'), primary_key=True)
-        SYM = Column(TEXT, primary_key=True)
-        AMT = Column(Integer, autoincrement=False)
-
-    class Transaction(Base):
-        __tablename__ = 'transaction'
-
-        tid = Column(Integer, primary_key=True, autoincrement=True)
-        uid = Column(Integer, ForeignKey('account.id'))
-        types = Column(CHAR(1))  # S for SELL, B for BUY
-        AMT = Column(Integer)
-        price = Column(Float)
-        SYM = Column(TEXT)
-
-    class Status(Base):
-        __tablename__ = 'status'
-
-        sid = Column(Integer, primary_key=True, autoincrement=True)
-        tid = Column(Integer, ForeignKey('transaction.tid'))
-        name = Column(String)
-        shares = Column(Integer)
-        price = Column(Float)
-        time = Column(TIMESTAMP)
+from sqlalchemy import create_engine
+from addTodb import *
 
 
 def main():
-    engine = create_engine('postgresql://postgres:passw0rd@localhost:5432/hw4')
-    Base = declarative_base()
+    engine = create_engine(
+        'postgresql://postgres:passw0rd@localhost:5432/hw4')
     # Check if connected to the database
     try:
         C_success = engine.connect()
@@ -51,8 +15,29 @@ def main():
 
     # Drop all the tables
     Base.metadata.drop_all(engine)
-    createTable(Base)
     Base.metadata.create_all(engine)
+    try:
+        addAccount(1, 100000, engine)
+        addAccount(1, 200, engine)
+    except Exception as e:
+        print(e)
+    try:
+        addPosition(1, 'T5asdf', 200, engine)
+        addPosition(1, 'T5asdf', 300, engine)
+        addTranscation(1, 'T5asdf', 400, 125, engine)
+        addTranscation(1, 'T5asdf', 400, 125, engine)
+        addTranscation(1, 'T5asdf', 200, 125, engine)
+        addTranscation(1, 'T5asdf', -300, 125, engine)
+        addStatus(1, 'executed', 100, 125.3, getCurrentTime(), engine)
+        # checkTIme(engine)
+        addTranscation(1, 'T5asdf', -300, 125, engine)
+        addTranscation(2, 'T5asdf', -400, 125, engine)
+        addPosition(1, 'S&P', 300, engine)
+        addPosition(1, 'BTC', 100, engine)
+        addPosition(2, 'T5asdf', 200, engine)
+        addAccount(0, 100, engine)
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':
