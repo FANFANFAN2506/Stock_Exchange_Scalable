@@ -13,8 +13,6 @@ server_socket.bind(server_address)
 server_socket.listen(1)
 print('Server is listening on {}:{}'.format(*server_address))
 
-# select
-
 # accept a connection
 client_socket, client_address = server_socket.accept()
 print('Connected by', client_address)
