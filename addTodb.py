@@ -38,7 +38,7 @@ def addPosition(account_ID, sym, num, engine):
     session = Session()
 
     # If the account doesn't exist
-    account = session.query(Account).filter(Account.id == UID).first()
+    account = session.query(Account).filter(Account.id == account_ID).first()
     if account is None:
         raise ValueError("Create Symbol rejected: Account doesn't exist")
 
@@ -60,9 +60,9 @@ def addTranscation(uid, sym, amt, price, engine):
     Session = sessionmaker(bind=engine)
     session = Session()
     # If the account doesn't exist
-    account = checkIfAccountExist(session, UID)
+    account = checkIfAccountExist(session, uid)
 
-    if AMOUNT > 0:
+    if amt > 0:
         # We need to check the balance
         print(account.balance)
         if account.balance < amt * price:
