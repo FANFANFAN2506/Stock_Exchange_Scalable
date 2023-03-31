@@ -42,63 +42,70 @@ def addAccount(ID, BALANCE):
 
 
 def addPosition(account_ID, sym, num, engine):
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
 
-    # If the account doesn't exist
-    account = session.query(Account).filter(Account.id == account_ID).first()
-    if account is None:
-        raise ValueError("Create Symbol rejected: Account doesn't exist")
+        # If the account doesn't exist
+        account = session.query(Account).filter(
+            Account.id == account_ID).first()
+        if account is None:
+            raise ValueError("Create Symbol rejected: Account doesn't exist")
 
-    # check if the symbol already exist
-    check_sym = session.query(Position).filter(
-        Position.uid == account_ID).filter(Position.symbol == sym).first()
-    if check_sym is None:
-        # The symbol doesn't exist, add a new one
-        position = Position(uid=account_ID, symbol=sym, amount=num)
-        session.add(position)
-    else:
-        # Else update the amount
-        check_sym.amount += num
-    session.commit()
+        # check if the symbol already exist
+        check_sym = session.query(Position).filter(
+            Position.uid == account_ID).filter(Position.symbol == sym).first()
+        if check_sym is None:
+            # The symbol doesn't exist, add a new one
+            position = Position(uid=account_ID, symbol=sym, amount=num)
+            session.add(position)
+        else:
+            # Else update the amount
+            check_sym.amount += num
+        session.commit()
+    except Exception as e:
+        print(e)
     session.close()
 
 
 def addTranscation(uid, sym, amt, price, engine):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    # If the account doesn't exist
-    account = checkIfAccountExist(session, uid)
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        # If the account doesn't exist
+        account = checkIfAccountExist(session, uid)
 
-    if amt > 0:
-        # We need to check the balance
-        print(account.balance)
-        if account.balance < amt * price:
-            raise ValueError(
-                "Create Transcation rejected: The remaining balance is not sufficient")
-        account.balance -= amt * price
-    else:
-        # It is a sell order:
-        if_position = session.query(Position).filter(
-            Position.uid == uid).filter(Position.symbol == sym).first()
-        if if_position is None:
-            # The symbol doesn't exist
-            raise ValueError(
-                "Create Transcation rejected: The symbol doesn't exist")
-        else:
-            print(if_position.amount)
-            if if_position.amount < abs(amt):
-                # The remaining shares are not sufficient
+        if amt > 0:
+            # We need to check the balance
+            print(account.balance)
+            if account.balance < amt * price:
                 raise ValueError(
-                    "Create Transcation rejected: The remaining shares are insufficient")
-            if_position.amount += amt
-    transaction = Transaction(uid=uid, symbol=sym, amount=amt, limit=price)
-    session.add(transaction)
-    session.commit()
-    status = Status(tid=transaction.tid, name='open',
-                    shares=amt, price=price, time=getCurrentTime())
-    session.add(status)
-    session.commit()
+                    "Create Transcation rejected: The remaining balance is not sufficient")
+            account.balance -= amt * price
+        else:
+            # It is a sell order:
+            if_position = session.query(Position).filter(
+                Position.uid == uid).filter(Position.symbol == sym).first()
+            if if_position is None:
+                # The symbol doesn't exist
+                raise ValueError(
+                    "Create Transcation rejected: The symbol doesn't exist")
+            else:
+                print(if_position.amount)
+                if if_position.amount < abs(amt):
+                    # The remaining shares are not sufficient
+                    raise ValueError(
+                        "Create Transcation rejected: The remaining shares are insufficient")
+                if_position.amount += amt
+        transaction = Transaction(uid=uid, symbol=sym, amount=amt, limit=price)
+        session.add(transaction)
+        session.commit()
+        status = Status(tid=transaction.tid, name='open',
+                        shares=amt, price=price, time=getCurrentTime())
+        session.add(status)
+        session.commit()
+    except Exception as e:
+        print(e)
     session.close()
 
 
