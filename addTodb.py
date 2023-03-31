@@ -4,11 +4,22 @@ from dbTable import *
 from utils import *
 
 
+def checkIfAccountExist(session, UID):
+    # If the account doesn't exist
+    account = session.query(Account).filter(Account.id == UID).first()
+    if account is None:
+        raise ValueError("Creation rejected: Account doesn't exist")
+    return account
+
+
 def addAccount(ID, BALANCE, engine):
     # Check if ID >= 1
     if ID < 1:
         raise ValueError(
             "Creation rejected: Account ID shouldn't be less than 1")
+    if BALANCE < 0:
+        raise ValueError(
+            "Creation rejected: Account Balance shouldn't be negative")
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -27,7 +38,7 @@ def addPosition(account_ID, sym, num, engine):
     session = Session()
 
     # If the account doesn't exist
-    account = session.query(Account).filter(Account.id == account_ID).first()
+    account = session.query(Account).filter(Account.id == UID).first()
     if account is None:
         raise ValueError("Create Symbol rejected: Account doesn't exist")
 
@@ -49,12 +60,9 @@ def addTranscation(uid, sym, amt, price, engine):
     Session = sessionmaker(bind=engine)
     session = Session()
     # If the account doesn't exist
-    account = session.query(Account).filter(Account.id == uid).first()
-    if account is None:
-        raise ValueError(
-            "Create Transcation rejected: Account doesn't exist")
-    # Check if it is a buy order
-    if amt > 0:
+    account = checkIfAccountExist(session, UID)
+
+    if AMOUNT > 0:
         # We need to check the balance
         print(account.balance)
         if account.balance < amt * price:
