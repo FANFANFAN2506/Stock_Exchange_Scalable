@@ -1,22 +1,29 @@
 import xml.etree.ElementTree as ET
-# from addTodb import *
+from queryDb import *
 from addTodb import *
 
 
 def create_symbol(child):
     print("Create symbol")
-    SYM = child.attrib['sym']
-    print(SYM)
-    for account_ins in child:
-        print(account_ins.text)
+    try:
+        checkSymbolName(child.attrib['sym'])
+        for account_ins in child:
+            print(child.attrib['sym'], int(account_ins.text))
+            addPosition(
+                account_ins.attrib['id'], child.attrib['sym'], int(account_ins.text))
+    except Exception as e:
+        print(e)
 
 
-def create_order(child):
+def create_order(root, child):
     print("Create order")
+    addTranscation(int(root.attrib['id']),
+                   child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
 
 
-def query_order(child):
+def query_order(root, child):
     print("query order")
+    query_transcation(int(root.attrib['id']), int(child.attrib['id']))
 
 
 def cancel_order(child):
@@ -28,7 +35,7 @@ def handle_create(root):
     for child in root:
         if child.tag == 'account':
             addAccount(int(child.attrib['id']), int(
-                child.attrib['balance']), engine)
+                child.attrib['balance']))
         else:
             create_symbol(child)
 
@@ -36,10 +43,10 @@ def handle_create(root):
 def handle_transcation(root):
     print("This is a transcations request")
     for child in root:
-        if child.tag == 'open':
-            create_order(child)
+        if child.tag == 'order':
+            create_order(root, child)
         elif child.tag == 'query':
-            query_order(child)
+            query_order(root, child)
         else:
             # cancle order
             cancel_order(child)
