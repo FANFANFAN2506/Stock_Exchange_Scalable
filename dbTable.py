@@ -9,15 +9,15 @@ class Account(Base):
     __tablename__ = 'account'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
-    Balance = Column(Float)
+    balance = Column(Float)
 
 
 class Position(Base):
     __tablename__ = 'position'
 
     uid = Column(Integer, ForeignKey('account.id'), primary_key=True)
-    SYM = Column(TEXT, primary_key=True)
-    AMT = Column(Integer, autoincrement=False)
+    symbol = Column(TEXT, primary_key=True)
+    amount = Column(Integer, autoincrement=False)
 
 
 class Transaction(Base):
@@ -27,9 +27,9 @@ class Transaction(Base):
     uid = Column(Integer, ForeignKey('account.id'))
     # Types could be checked using sign of amount
     # types = Column(CHAR(1))  # S for SELL, B for BUY
-    AMT = Column(Integer)
-    LIMIT = Column(Float)
-    SYM = Column(TEXT)
+    amount = Column(Integer)
+    limit = Column(Float)
+    symbol = Column(TEXT)
 
 
 class Status(Base):

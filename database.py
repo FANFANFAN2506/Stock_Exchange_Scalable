@@ -4,7 +4,7 @@ from addTodb import *
 
 def main():
     engine = create_engine(
-        'postgresql://postgres:passw0rd@localhost:5432/hw4')
+        'postgresql://postgres:passw0rd@localhost:5432/hw4_568')
     # Check if connected to the database
     try:
         C_success = engine.connect()
@@ -15,7 +15,9 @@ def main():
 
     # Drop all the tables
     Base.metadata.drop_all(engine)
+    print("drop all table")
     Base.metadata.create_all(engine)
+    print("create all table")
     try:
         addAccount(1, 100000, engine)
         addAccount(1, 200, engine)
