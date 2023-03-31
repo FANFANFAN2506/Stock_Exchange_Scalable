@@ -16,90 +16,105 @@ def addAccount(ID, BALANCE, engine):
     account = session.query(Account).filter(Account.id == ID).first()
     if account is not None:
         raise ValueError("Create rejected: Account ID exists")
-    account = Account(id=ID, Balance=BALANCE)
+    account = Account(id=ID, balance=BALANCE)
     session.add(account)
     session.commit()
     session.close()
 
 
-def addPosition(UID, symbol, num, engine):
+def addPosition(account_ID, sym, num, engine):
     Session = sessionmaker(bind=engine)
     session = Session()
 
     # If the account doesn't exist
-    account = session.query(Account).filter(Account.id == UID).first()
+    account = session.query(Account).filter(Account.id == account_ID).first()
     if account is None:
         raise ValueError("Create Symbol rejected: Account doesn't exist")
 
     # check if the symbol already exist
     check_sym = session.query(Position).filter(
-        Position.uid == UID).filter(Position.SYM == symbol).first()
+        Position.uid == account_ID).filter(Position.symbol == sym).first()
     if check_sym is None:
         # The symbol doesn't exist, add a new one
-        position = Position(uid=UID, SYM=symbol, AMT=num)
+        position = Position(uid=account_ID, symbol=sym, amount=num)
         session.add(position)
     else:
         # Else update the amount
-        check_sym.AMT += num
+        check_sym.amount += num
     session.commit()
     session.close()
 
 
-def addTranscation(UID, SYMBOL, AMOUNT, PRICE, engine):
+def addTranscation(uid, sym, amt, price, engine):
     Session = sessionmaker(bind=engine)
     session = Session()
     # If the account doesn't exist
-    account = session.query(Account).filter(Account.id == UID).first()
+    account = session.query(Account).filter(Account.id == uid).first()
     if account is None:
         raise ValueError(
             "Create Transcation rejected: Account doesn't exist")
     # Check if it is a buy order
-    if AMOUNT > 0:
+    if amt > 0:
         # We need to check the balance
-        print(account.Balance)
-        if account.Balance < AMOUNT * PRICE:
+        print(account.balance)
+        if account.balance < amt * price:
             raise ValueError(
                 "Create Transcation rejected: The remaining balance is not sufficient")
-        account.Balance -= AMOUNT * PRICE
+        account.balance -= amt * price
     else:
         # It is a sell order:
         if_position = session.query(Position).filter(
-            Position.uid == UID).filter(Position.SYM == SYMBOL).first()
+            Position.uid == uid).filter(Position.symbol == sym).first()
         if if_position is None:
             # The symbol doesn't exist
             raise ValueError(
                 "Create Transcation rejected: The symbol doesn't exist")
         else:
-            print(if_position.AMT)
-            if if_position.AMT < abs(AMOUNT):
+            print(if_position.amount)
+            if if_position.amount < abs(amt):
                 # The remaining shares are not sufficient
                 raise ValueError(
                     "Create Transcation rejected: The remaining shares are insufficient")
-            if_position.AMT += AMOUNT
-    transaction = Transaction(uid=UID, SYM=SYMBOL, AMT=AMOUNT, LIMIT=PRICE)
+            if_position.amount += amt
+    transaction = Transaction(uid=uid, symbol=sym, amount=amt, limit=price)
     session.add(transaction)
     session.commit()
     status = Status(tid=transaction.tid, name='open',
-                    shares=AMOUNT, price=PRICE, time=getCurrentTime())
+                    shares=amt, price=price, time=getCurrentTime())
     session.add(status)
     session.commit()
     session.close()
 
 
-def addStatus(TID, NAME, SHARES, PRICE, TIME, engine):
+def addStatus(tid, name, shares, price, time, engine):
     # When we need to add status, we need to check the id before call this function
     Session = sessionmaker(bind=engine)
     session = Session()
-    status = Status(tid=TID, name=NAME, shares=SHARES, price=PRICE, time=TIME)
+    status = Status(tid=tid, name=name, shares=shares, price=price, time=time)
     session.add(status)
     session.commit()
     session.close()
 
 
-def checkTIme(engine):
+def checkTime(engine):
     Session = sessionmaker(bind=engine)
     session = Session()
 
     saved_time = session.query(Status).first()
     # Convert datetime into seconds since epocha
     print(int(saved_time.time.timestamp()))
+
+
+def queryTransactions(tid, engine):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    result = session.query(Transaction.tid, Status.name, Status.shares, Status.price, Status.time).filter(Transaction.tid==tid)
+    result = result.all()
+    
+def cancelTransactions(TID, engine):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    result = session.query(Status).filter(Transaction.tid==TID, Status.name=='open')
+    for res in result:
+        res.name = 'canceled'
+    session.commit()
