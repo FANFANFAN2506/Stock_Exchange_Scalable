@@ -8,59 +8,79 @@ def create_symbol(child):
     try:
         checkSymbolName(child.attrib['sym'])
         for account_ins in child:
-            print(child.attrib['sym'], int(account_ins.text))
-            addPosition(
-                account_ins.attrib['id'], child.attrib['sym'], int(account_ins.text))
+            attributes = {
+                'sym': child.attrib['sym'], 'id': account_ins.attrib['id']}
+            try:
+                addPosition(
+                    account_ins.attrib['id'], child.attrib['sym'], int(account_ins.text))
+                return construct_node('created', None, **attributes)
+            except Exception as e:
+                return construct_node('error', str(e), **attributes)
     except Exception as e:
         print(e)
 
 
-def create_order(root, child):
+def order_Transcation(root, child):
     print("Create order")
     addTranscation(int(root.attrib['id']),
                    child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
 
 
-def query_order(root, child):
+def query_Transcation(root, child):
     print("query order")
     query_transcation(int(root.attrib['id']), int(child.attrib['id']))
 
 
-def cancel_order(child):
+def cancel_Transcation(root, child):
     print("cancel order")
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        all_status = session.query(Status).join(Transaction).join(Account).filter(
+            Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id'])
+        open_status = all_status.filter(Status.name == 'open').first()
+        open_status.name = 'canceled'
+        open_status.time = getCurrentTime()
+        session.commit()
+        session.close()
+    except Exception as e:
+        print(e)
 
 
-def handle_create(root):
+def handle_create(root, response):
     print("This is a create request")
     for child in root:
         if child.tag == 'account':
-            addAccount(int(child.attrib['id']), int(
-                child.attrib['balance']))
+            attributes = {'id': child.attrib['id']}
+            try:
+                addAccount(int(child.attrib['id']), int(
+                    child.attrib['balance']))
+                response.append(construct_node('created', None, **attributes))
+            except Exception as e:
+                response.append(construct_node(
+                    'error', str(e), **attributes))
         else:
-            create_symbol(child)
+            response.append(create_symbol(child))
 
 
-def handle_transcation(root):
+def handle_transcation(root, response):
     print("This is a transcations request")
     for child in root:
         if child.tag == 'order':
-            create_order(root, child)
+            order_Transcation(root, child)
         elif child.tag == 'query':
-            query_order(root, child)
+            query_Transcation(root, child)
         else:
             # cancle order
-            cancel_order(child)
+            cancel_Transcation(root, child)
 
 
 def parsing_XML(request):
     root = ET.fromstring(request)
+    response = ET.Element("result")
     # create tag
     if root.tag == 'create':
-        handle_create(root)
+        handle_create(root, response)
     else:
-        handle_transcation(root)
-    # for child in root:
-    #     print(child.tag)
-    #     for key, value in child.items():
-    #         print(f"{key}:{value} ", end="")
-    #     print()
+        handle_transcation(root, response)
+    print(ET.tostring(response).decode())

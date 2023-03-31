@@ -18,60 +18,52 @@ def checkSymbolName(symbol):
 
 
 def addAccount(ID, BALANCE):
-    try:
-        # Check if ID >= 1
-        if ID < 1:
-            raise ValueError(
-                "Creation rejected: Account ID shouldn't be less than 1")
-        if BALANCE < 0:
-            raise ValueError(
-                "Creation rejected: Account Balance shouldn't be negative")
-        Session = sessionmaker(bind=engine)
-        session = Session()
+    # Check if ID >= 1
+    if ID < 1:
+        raise ValueError(
+            "Creation rejected: Account ID shouldn't be less than 1")
+    if BALANCE < 0:
+        raise ValueError(
+            "Creation rejected: Account Balance shouldn't be negative")
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
-        # Check if ID exist:
-        account = session.query(Account).filter(Account.id == ID).first()
-        if account is not None:
-            raise ValueError("Create rejected: Account ID exists")
-        account = Account(id=ID, Balance=BALANCE)
-        session.add(account)
-        session.commit()
-    except Exception as e:
-        print(e)
+    # Check if ID exist:
+    account = session.query(Account).filter(Account.id == ID).first()
+    if account is not None:
+        raise ValueError("Create rejected: Account ID exists")
+    account = Account(id=ID, balance=BALANCE)
+    session.add(account)
+    session.commit()
     session.close()
 
 
-def addPosition(account_ID, sym, num, engine):
-    try:
-        Session = sessionmaker(bind=engine)
-        session = Session()
+def addPosition(account_ID, sym, num):
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
-        # If the account doesn't exist
-        account = session.query(Account).filter(
-            Account.id == account_ID).first()
-        if account is None:
-            raise ValueError("Create Symbol rejected: Account doesn't exist")
+    # If the account doesn't exist
+    checkIfAccountExist(session, account_ID)
 
-        # check if the symbol already exist
-        check_sym = session.query(Position).filter(
-            Position.uid == account_ID).filter(Position.symbol == sym).first()
-        if check_sym is None:
-            # The symbol doesn't exist, add a new one
-            position = Position(uid=account_ID, symbol=sym, amount=num)
-            session.add(position)
-        else:
-            # Else update the amount
-            check_sym.amount += num
-        session.commit()
-    except Exception as e:
-        print(e)
+    # check if the symbol already exist
+    check_sym = session.query(Position).filter(
+        Position.uid == account_ID).filter(Position.symbol == sym).first()
+    if check_sym is None:
+        # The symbol doesn't exist, add a new one
+        position = Position(uid=account_ID, symbol=sym, amount=num)
+        session.add(position)
+    else:
+        # Else update the amount
+        check_sym.amount += num
+    session.commit()
     session.close()
 
 
-def addTranscation(uid, sym, amt, price, engine):
+def addTranscation(uid, sym, amt, price):
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
+
         # If the account doesn't exist
         account = checkIfAccountExist(session, uid)
 
@@ -101,7 +93,7 @@ def addTranscation(uid, sym, amt, price, engine):
         session.add(transaction)
         session.commit()
         status = Status(tid=transaction.tid, name='open',
-                        shares=amt, price=price, time=getCurrentTime())
+                        shares=amt, price=price)
         session.add(status)
         session.commit()
     except Exception as e:
@@ -109,7 +101,7 @@ def addTranscation(uid, sym, amt, price, engine):
     session.close()
 
 
-def addStatus(tid, name, shares, price, time, engine):
+def addStatus(tid, name, shares, price, time):
     # When we need to add status, we need to check the id before call this function
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -119,28 +111,10 @@ def addStatus(tid, name, shares, price, time, engine):
     session.close()
 
 
-def checkTime(engine):
+def checkTime():
     Session = sessionmaker(bind=engine)
     session = Session()
 
     saved_time = session.query(Status).first()
     # Convert datetime into seconds since epocha
     print(int(saved_time.time.timestamp()))
-
-
-def queryTransactions(tid, engine):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    result = session.query(Transaction.tid, Status.name, Status.shares,
-                           Status.price, Status.time).filter(Transaction.tid == tid)
-    result = result.all()
-
-
-def cancelTransactions(TID, engine):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    result = session.query(Status).filter(
-        Transaction.tid == TID, Status.name == 'open')
-    for res in result:
-        res.name = 'canceled'
-    session.commit()
