@@ -2,6 +2,7 @@ from parse import *
 from match_price import *
 from addTodb import addTranscation
 
+
 def testMatch():
     addAccount(1, 100000)
     addAccount(2, 100000)
@@ -18,19 +19,20 @@ def testMatch():
     addPosition(6, 'X', 500)
     addPosition(7, 'X', 500)
     addPosition(6, 'Y', 500)
-    
+
     addTranscation(1, 'X', 300, 125)
-    #execute_order(1)
+    # execute_order(1)
     addTranscation(2, 'X', -100, 130)
     addTranscation(3, 'X', 200, 127)
-    #execute_order(3)
+    # execute_order(3)
     addTranscation(4, 'X', -500, 128)
     addTranscation(5, 'X', -200, 140)
     addTranscation(6, 'X', 400, 125)
     addTranscation(6, 'Y', 400, 125)
-    #execute_order(6)
+    # execute_order(6)
     addTranscation(7, 'X', 400, 139)
     execute_order(7, 'X', 400, 139)
+
 
 def testParse():
     xmlString = "<create><account id=\"1\" balance=\"50000\"/><account id=\"2\" balance=\"100000\"/><symbol sym=\"TESLA\"><account id=\"1\">200</account><account id=\"1\">-500</account></symbol></create>"
@@ -79,8 +81,8 @@ def main():
     # Drop all the tables
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    testMatch()
-    #testParse()
+    # testMatch()
+    testParse()
     # testAdd()
 
 

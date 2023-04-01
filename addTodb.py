@@ -97,7 +97,7 @@ def addTranscation(uid, sym, amt, price):
     session.add(transaction)
     session.commit()
     status = Status(tid=transaction.tid, name='open',
-                    shares=amt, price=price)
+                    shares=amt, price=price, time=getCurrentTime())
     session.add(status)
 
     session.commit()
