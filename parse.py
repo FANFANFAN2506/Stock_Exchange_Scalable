@@ -53,7 +53,7 @@ def cancel_Transcation(root, child, response):
     if all_status.count() == 0:
         Msg = "Transcation id doesn't exist"
         attributes = {'id': str(child.attrib['id'])}
-        response.append(construct_node('node', Msg, **attributes))
+        response.append(construct_node('error', Msg, **attributes))
         return
     open_status = all_status.filter(Status.name == 'open').first()
     open_status.name = 'canceled'
