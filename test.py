@@ -1,6 +1,7 @@
 from parse import *
 from match_price import *
 from addTodb import addTranscation
+import time
 
 
 def testMatch():
@@ -27,11 +28,14 @@ def testMatch():
     # execute_order(3)
     addTranscation(4, 'X', -500, 128)
     addTranscation(5, 'X', -200, 140)
+    time.sleep(1)
     addTranscation(6, 'X', 400, 125)
+    time.sleep(1)
     addTranscation(6, 'Y', 400, 125)
+    addTranscation(7, 'X', 300, 125)
     # execute_order(6)
-    addTranscation(7, 'X', 400, 139)
-    execute_order(7, 'X', 400, 139)
+    addTranscation(7, 'X', -400, 120)
+    execute_order(7, 'X', -400, 120)
 
 
 def testParse():
@@ -81,8 +85,8 @@ def main():
     # Drop all the tables
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    # testMatch()
-    testParse()
+    testMatch()
+    #testParse()
     # testAdd()
 
 
