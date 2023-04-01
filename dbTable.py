@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, Float, Column, String, ForeignKey, TEXT, CHAR, TIMESTAMP
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
-engine = create_engine('postgresql://postgres:passw0rd@localhost:5432/hw4')
+engine = create_engine('postgresql://postgres:passw0rd@localhost:5432/hw4_568')
 Base = declarative_base()
 
 
@@ -27,6 +27,7 @@ class Transaction(Base):
     uid = Column(Integer, ForeignKey('account.id'))
     # Types could be checked using sign of amount
     # types = Column(CHAR(1))  # S for SELL, B for BUY
+    #amount > 0 : buy order, amount < 0 : sell order
     amount = Column(Integer)
     limit = Column(Float)
     symbol = Column(TEXT)
