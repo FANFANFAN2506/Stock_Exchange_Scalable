@@ -30,8 +30,8 @@ def testMatch():
     addTranscation(6, 'X', 400, 125)
     addTranscation(6, 'Y', 400, 125)
     # execute_order(6)
-    addTranscation(7, 'X', 400, 139)
-    execute_order(7, 'X', 400, 139)
+    addTranscation(7, 'X', -400, 124)
+    execute_order(7, 'X', -400, 124)
 
 
 def testParse():
@@ -81,8 +81,8 @@ def main():
     # Drop all the tables
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    # testMatch()
-    testParse()
+    testMatch()
+    # testParse()
     # testAdd()
 
 

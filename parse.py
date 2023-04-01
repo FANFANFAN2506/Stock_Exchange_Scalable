@@ -28,10 +28,12 @@ def create_symbol(child):
 
 def order_Transcation(root, child, response):
     attributes = {'sym': child.attrib['sym'], 'amount':
-                  child.attrib['amount'], 'limit': child.attrib['limit']}
+                  abs(child.attrib['amount']), 'limit': child.attrib['limit']}
     try:
+        if child.attrib['limit'] <= 0:
+            raise ValueError("Price should be positive")
         addTranscation(int(root.attrib['id']),
-                       child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
+                       child.attrib['sym'], int(abs(child.attrib['amount'])), float(child.attrib['limit']))
         attributes['id'] = root.attrib['id']
         response.append(construct_node('opened', None, **attributes))
     except Exception as e:
@@ -63,13 +65,13 @@ def cancel_Transcation(root, child, response):
         Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id'])
     for tuple in order:
         if tuple.name == 'canceled':
-            attributes = {'shares': str(tuple.shares),
+            attributes = {'shares': str(abs(tuple.shares)),
                           'time': str(tuple.time.timestamp())}
             cancel_node.append(construct_node(
                 'canceled', None, **attributes))
         else:
-            attributes = {'shares': tuple.shares,
-                          'price': tuple.price, 'time': str(tuple.time.timestamp())}
+            attributes = {'shares': str(abs(tuple.shares)),
+                          'price': str(tuple.price), 'time': str(tuple.time.timestamp())}
             cancel_node.append(construct_node(
                 'executed', None, **attributes))
     response.append(cancel_node)
