@@ -50,7 +50,7 @@ def check_matching_order(session, amount, symbol, limit):
                                          Transaction.limit > limit,
                                          Transaction.amount > 0,
                                          Status.name == 'open')
-    match_order = match_order.order_by(Transaction.limit.desc()).all()
+    match_order = match_order.order_by(Transaction.limit.desc(), Status.time).all()
     print("check match order")
     print_matching_order(match_order)
     return match_order
