@@ -86,7 +86,6 @@ def addTranscation(uid, sym, amt, price):
             raise ValueError(
                 "The symbol doesn't exist")
         else:
-            print(if_position.amount)
             if if_position.amount < abs(amt):
                 # The remaining shares are not sufficient
                 raise ValueError(

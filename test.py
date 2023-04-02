@@ -38,6 +38,11 @@ def testMatch():
     execute_order(7, 'X', -400, 120)
 
 
+''' 
+@func: This is the unit test and combination test for XML parser and adding to databse functions
+'''
+
+
 def testParse():
     xmlString = "<create><account id=\"1\" balance=\"50000\"/><account id=\"2\" balance=\"100000\"/><symbol sym=\"TESLA\"><account id=\"1\">200</account><account id=\"1\">500</account></symbol></create>"
     xmlString2 = "<transactions id=\"1\"><order sym=\"TESLA\" amount=\"-100\" limit=\"250\"/><order sym=\"TESLA\" amount=\"-200\" limit=\"300\"/><query id=\"1\"/><cancel id=\"1\"/><query id=\"2\"/></transactions>"
@@ -48,27 +53,43 @@ def testParse():
     # parsing_XML(xmlString3)
 
 
+''' 
+@func: This is the unit test for adding to database function
+'''
+
+
 def testAdd():
     try:
+        print("----Test 1 Failed: Account exist----")
         addAccount(1, 100000)
         addAccount(1, 200)
     except Exception as e:
         print(e)
+
+    print("")
     try:
+        print("----Test 2 Failed: Balance not sufficient----")
         addPosition(1, 'T5asdf', 200)
         addPosition(1, 'T5asdf', 300)
-        # addTranscation(1, 'T5asdf', 400, 125, engine)
-        # addTranscation(1, 'T5asdf', 400, 125, engine)
-        # addTranscation(1, 'T5asdf', 200, 125, engine)
-        # addTranscation(1, 'T5asdf', -300, 125, engine)
-        # addStatus(1, 'executed', 100, 125.3, getCurrentTime(), engine)
-        # # checkTIme(engine)
-        # addTranscation(1, 'T5asdf', -300, 125, engine)
-        # addTranscation(2, 'T5asdf', -400, 125, engine)
-        # addPosition(1, 'S&P', 300, engine)
-        # addPosition(1, 'BTC', 100, engine)
-        # addPosition(2, 'T5asdf', 200, engine)
-        # addAccount(0, 100, engine)
+        addTranscation(1, 'T5asdf', 400, 125)
+        addTranscation(1, 'T5asdf', 400, 125)
+        addTranscation(1, 'T5asdf', 200, 125)
+
+    except Exception as e:
+        print(e)
+
+    print("")
+    try:
+        print("----Test 3 Failed: amount not sufficient----")
+        addAccount(2, 200)
+        addPosition(2, 'T5asdf', 200)
+        addTranscation(2, 'T5asdf', -400, 125)
+    except Exception as e:
+        print(e)
+    try:
+        addPosition(1, 'S&P', 300)
+        addPosition(1, 'BTC', 100)
+        addStatus(1, 'executed', 100, 100, getCurrentTime())
     except Exception as e:
         print(e)
 
@@ -87,8 +108,8 @@ def main():
     Base.metadata.create_all(engine)
     # testMatch()
 
-    testParse()
-    # testAdd()
+    # testParse()
+    testAdd()
 
 
 if __name__ == '__main__':
