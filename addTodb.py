@@ -68,7 +68,6 @@ def addPosition(account_ID, sym, num):
 def addTranscation(uid, sym, amt, price):
     Session = sessionmaker(bind=engine)
     session = Session()
-
     # If the account doesn't exist
     account = checkIfAccountExist(session, uid)
 

@@ -39,13 +39,13 @@ def testMatch():
 
 
 def testParse():
-    xmlString = "<create><account id=\"1\" balance=\"50000\"/><account id=\"2\" balance=\"100000\"/><symbol sym=\"TESLA\"><account id=\"1\">200</account><account id=\"1\">-500</account></symbol></create>"
-    xmlString2 = "<transactions id=\"1\"><order sym=\"TESLA\" amount=\"100\" limit=\"250\"/><order sym=\"TESLA\" amount=\"-200\" limit=\"300\"/><query id=\"0\"/><cancel id=\"1\"/><query id=\"1\"/></transactions>"
+    xmlString = "<create><account id=\"1\" balance=\"50000\"/><account id=\"2\" balance=\"100000\"/><symbol sym=\"TESLA\"><account id=\"1\">200</account><account id=\"1\">500</account></symbol></create>"
+    xmlString2 = "<transactions id=\"1\"><order sym=\"TESLA\" amount=\"-100\" limit=\"250\"/><order sym=\"TESLA\" amount=\"-200\" limit=\"300\"/><query id=\"1\"/><cancel id=\"1\"/><query id=\"2\"/></transactions>"
     xmlString3 = "<transactions id=\"0\"><order sym=\"TESLA\" amount=\"100\" limit=\"250\"/></transactions>"
     xmlString4 = "<transactions id=\"1\"><order sym=\"TESLA\" amount=\"100\" limit=\"250\"/></transactions>"
     parsing_XML(xmlString)
     parsing_XML(xmlString2)
-    parsing_XML(xmlString3)
+    # parsing_XML(xmlString3)
 
 
 def testAdd():
@@ -85,9 +85,9 @@ def main():
     # Drop all the tables
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    testMatch()
+    # testMatch()
 
-    # testParse()
+    testParse()
     # testAdd()
 
 

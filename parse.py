@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from queryDb import *
 from addTodb import *
+from match_price import *
 
 
 def create_symbol(child):
@@ -28,12 +29,14 @@ def create_symbol(child):
 
 def order_Transcation(root, child, response):
     attributes = {'sym': child.attrib['sym'], 'amount':
-                  abs(child.attrib['amount']), 'limit': child.attrib['limit']}
+                  str(int(child.attrib['amount'])), 'limit': child.attrib['limit']}
     try:
-        if child.attrib['limit'] <= 0:
+        if int(child.attrib['limit']) <= 0:
             raise ValueError("Price should be positive")
         addTranscation(int(root.attrib['id']),
-                       child.attrib['sym'], int(abs(child.attrib['amount'])), float(child.attrib['limit']))
+                       child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
+        # execute_order(int(root.attrib['id']), child.attrib['sym'], int(
+        #     child.attrib['amount']), float(child.attrib['limit']))
         attributes['id'] = root.attrib['id']
         response.append(construct_node('opened', None, **attributes))
     except Exception as e:
@@ -65,12 +68,12 @@ def cancel_Transcation(root, child, response):
         Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id'])
     for tuple in order:
         if tuple.name == 'canceled':
-            attributes = {'shares': str(abs(tuple.shares)),
+            attributes = {'shares': str(abs(int(tuple.shares))),
                           'time': str(tuple.time.timestamp())}
             cancel_node.append(construct_node(
                 'canceled', None, **attributes))
         else:
-            attributes = {'shares': str(abs(tuple.shares)),
+            attributes = {'shares': str(abs(int(tuple.shares))),
                           'price': str(tuple.price), 'time': str(tuple.time.timestamp())}
             cancel_node.append(construct_node(
                 'executed', None, **attributes))
@@ -103,6 +106,7 @@ def handle_transcation(root, response):
         checkIfAccountExist(session, int(root.attrib['id']))
         for child in root:
             if child.tag == 'order':
+                print("place order")
                 order_Transcation(root, child, response)
             elif child.tag == 'query':
                 query_Transcation(root, child, response)

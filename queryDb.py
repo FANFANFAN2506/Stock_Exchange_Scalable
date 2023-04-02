@@ -18,15 +18,15 @@ def query_transcation(UID, TID):
     else:
         for tuple in order:
             if tuple.name == 'open':
-                attributes = {'shares': str(tuple.shares)}
+                attributes = {'shares': str(abs(tuple.shares))}
                 status_node.append(construct_node('open', None, **attributes))
             elif tuple.name == 'canceled':
-                attributes = {'shares': str(tuple.shares),
+                attributes = {'shares': str(abs(tuple.shares)),
                               'time': str(tuple.time.timestamp())}
                 status_node.append(construct_node(
                     'canceled', None, **attributes))
             else:
-                attributes = {'shares': tuple.shares,
+                attributes = {'shares': str(abs(tuple.shares)),
                               'price': tuple.price, 'time': str(tuple.time.timestamp())}
                 status_node.append(construct_node(
                     'executed', None, **attributes))
