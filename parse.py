@@ -5,12 +5,10 @@ from match_price import *
 
 
 def create_symbol(child):
-    print("Create symbol")
     return_node = ET.Element("temp")
     try:
         checkSymbolName(child.attrib['sym'])
         for account_ins in child:
-            print(account_ins.text)
             attributes = {
                 'sym': child.attrib['sym'], 'id': account_ins.attrib['id']}
             try:
@@ -65,24 +63,13 @@ def cancel_Transcation(root, child, response):
     open_status.time = getCurrentTime()
     session.commit()
     order = session.query(Status).join(Transaction).join(Account).filter(
-        Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id'])
-    for tuple in order:
-        if tuple.name == 'canceled':
-            attributes = {'shares': str(abs(int(tuple.shares))),
-                          'time': str(tuple.time.timestamp())}
-            cancel_node.append(construct_node(
-                'canceled', None, **attributes))
-        else:
-            attributes = {'shares': str(abs(int(tuple.shares))),
-                          'price': str(tuple.price), 'time': str(tuple.time.timestamp())}
-            cancel_node.append(construct_node(
-                'executed', None, **attributes))
+        Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id']).order_by(Status.sid.asc())
+    query_status(cancel_node, order)
     response.append(cancel_node)
     session.close()
 
 
 def handle_create(root, response):
-    print("This is a create request")
     for child in root:
         if child.tag == 'account':
             attributes = {'id': child.attrib['id']}
@@ -99,14 +86,12 @@ def handle_create(root, response):
 
 
 def handle_transcation(root, response):
-    print("This is a transcations request")
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
         checkIfAccountExist(session, int(root.attrib['id']))
         for child in root:
             if child.tag == 'order':
-                print("place order")
                 order_Transcation(root, child, response)
             elif child.tag == 'query':
                 query_Transcation(root, child, response)
