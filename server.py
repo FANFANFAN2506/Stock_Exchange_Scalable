@@ -1,4 +1,16 @@
 import socket
+from parse import *
+from multiprocessing import Process
+
+def handle_client_xml(client_socket):
+    data = client_socket.recv(1024)
+    received_request = data.decode()
+    print('Received xml:', received_request)
+    response = parsing_XML(received_request)
+
+    # send a response back to the client
+    client_socket.sendall(response.encode())
+    client_socket.close()
 
 
 def serverLitsen():
@@ -16,6 +28,7 @@ def serverLitsen():
         server_socket.listen(1)
         print('Server is listening on {}:{}'.format(*server_address))
 
+<<<<<<< HEAD
         # accept a connection
         client_socket, client_address = server_socket.accept()
         print('Connected by', client_address)
@@ -31,3 +44,12 @@ def serverLitsen():
     # close the connection
     client_socket.close()
     server_socket.close()
+=======
+    # receive data from the client
+    p = Process(target=handle_client_xml, args=(client_socket,))
+    p.start()
+    p.join()
+
+# close the connection
+server_socket.close()
+>>>>>>> a42fe162961505d5d391cf9294ae8b2b1ee7e9f3

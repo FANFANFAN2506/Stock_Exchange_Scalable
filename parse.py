@@ -111,5 +111,9 @@ def parsing_XML(request):
         handle_create(root, response)
     else:
         handle_transcation(root, response)
+<<<<<<< HEAD
     print(ET.tostring(response).decode())
+=======
+    #print(ET.tostring(response).decode())
+>>>>>>> a42fe162961505d5d391cf9294ae8b2b1ee7e9f3
     return ET.tostring(response).decode()

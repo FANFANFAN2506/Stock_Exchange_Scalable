@@ -2,7 +2,6 @@ from sqlalchemy import Integer, Float, Column, String, ForeignKey, TEXT, CHAR, T
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 engine = create_engine('postgresql://postgres:passw0rd@localhost:5432/hw4_568')
-# engine = create_engine('postgresql://postgres:passw0rd@localhost:5432/hw4')
 Base = declarative_base()
 
 

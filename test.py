@@ -179,7 +179,7 @@ def main():
     Base.metadata.create_all(engine)
 
     # testMatch()
-    # testParse()
+    testParse()
     # testAdd()
     # testParseMatch()
     testSocket()
