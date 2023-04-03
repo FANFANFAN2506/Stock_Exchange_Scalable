@@ -72,6 +72,7 @@ def addTranscation(uid, sym, amt, price):
     account = checkIfAccountExist(session, uid)
 
     if amt > 0:
+        # It is a buy order
         # We need to check the balance
         if account.balance < amt * price:
             raise ValueError(

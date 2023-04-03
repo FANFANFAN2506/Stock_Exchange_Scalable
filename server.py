@@ -1,12 +1,13 @@
 import socket
 from parse import *
-from multiprocessing import Process
+from multiprocessing import Process, Pool
+import os
 
 
 def handle_client_xml(client_socket):
     data = client_socket.recv(1024)
     received_request = data.decode()
-    print('Received xml:', received_request)
+    print(f"Received xml {received_request} on {os.getpid()}")
     response = parsing_XML(received_request)
 
     # send a response back to the client
@@ -22,17 +23,21 @@ def serverLitsen():
 
     # bind the socket to a specific address and port
     server_address = ('localhost', 12345)
+    print('Server is listening on {}:{}'.format(*server_address))
     server_socket.bind(server_address)
-
+    pool = Pool(5)
+    server_socket.listen(20)
     while(1):
-        # listen for incoming connections
-        server_socket.listen(1)
-        print('Server is listening on {}:{}'.format(*server_address))
+        client_socket, addr = server_socket.accept()
+        pool.apply_async(func=handle_client_xml, args=(client_socket))
 
-    # receive data from the client
-    p = Process(target=handle_client_xml, args=(client_socket,))
-    p.start()
-    p.join()
-
-    #   close the connection
-    server_socket.close()
+    # while(1):
+    #     # listen for incoming connections
+    #     server_socket.listen(1)
+    #     print('Server is listening on {}:{}'.format(*server_address))
+    #     # receive data from the client
+    #     p = Process(target=handle_client_xml, args=(client_socket,))
+    #     p.start()
+    #     p.join()
+    #     #   close the connection
+    # server_socket.close()
