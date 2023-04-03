@@ -64,13 +64,11 @@ print('Connected to', server_address)
 # # print('Received data:', response.decode())
 
 
-request = "<create><account id=\"0\" balance=\"50000\"/><account id=\"2\" balance=\"-100000\"/><symbol sym=\"TESLA\"><account id=\"1\">200</account></symbol></create>"
+request = "<create><account id=\"1\" balance=\"50000\"/><account id=\"2\" balance=\"100000\"/><symbol sym=\"TESLA\"><account id=\"1\">200</account></symbol></create>"
 client_socket.sendall(request.encode())
-
+print("Request sent")
 # receive data from server
 response = client_socket.recv(1024)
 print('Received data:', response.decode())
-print()
-print('directing parse result: ', parsing_XML(request))
 # close the connection
 client_socket.close()

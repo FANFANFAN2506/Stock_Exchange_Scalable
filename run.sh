@@ -1,6 +1,14 @@
 #!/bin/bash
-python3 server.py
-for i in {1..10}
+# python3 test.py &
+# pid=$!
+
+# echo "Server process started with PID: $pid"
+# sleep 1
+for i in {1..2}
 do
-    python3 client.py
+    echo "Client $i started with PID: $pid"
+    python3 client.py > outcome.txt &
 done
+
+# kill $pid
+# echo "Background process terminated"

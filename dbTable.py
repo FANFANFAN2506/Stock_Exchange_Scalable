@@ -1,7 +1,10 @@
 from sqlalchemy import Integer, Float, Column, String, ForeignKey, TEXT, CHAR, TIMESTAMP
+from sqlalchemy.pool import NullPool
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
-engine = create_engine('postgresql://postgres:passw0rd@localhost:5432/hw4_568')
+engine = create_engine(
+    'postgresql://postgres:passw0rd@localhost:5432/hw4_568', poolclass=NullPool, isolation_level='SERIALIZABLE')
+print("engine setup")
 Base = declarative_base()
 
 

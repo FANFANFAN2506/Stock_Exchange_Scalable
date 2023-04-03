@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from parse import *
 from match_price import *
 from addTodb import addTranscation
@@ -183,10 +184,10 @@ def main():
     Base.metadata.create_all(engine)
 
     # testMatch()
-    testParse()
+    # testParse()
     # testAdd()
     # testParseMatch()
-    # testSocket()
+    testSocket()
 
 
 if __name__ == '__main__':
