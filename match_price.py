@@ -30,9 +30,9 @@ def print_current_symbol_status():
     session.close()
 
 
-def check_matching_order(session, amount, symbol, limit):
+def check_matching_order(session, uid, amount, symbol, limit):
     match_order = session.query(Status).join(
-        Transaction).filter(Status.tid == Transaction.tid)
+        Transaction).filter(Status.tid == Transaction.tid, Transaction.uid != uid)
     print("before matching")
     print_matching_order(match_order)
     if amount == 0:
@@ -44,13 +44,14 @@ def check_matching_order(session, amount, symbol, limit):
                                          Transaction.limit < limit,
                                          Transaction.amount < 0,
                                          Status.name == 'open')
+        match_order = match_order.order_by(Transaction.limit, Status.time).all()
     # if it is a sell order, matching order will be buy orders with limit higher than this sell order's limit
     else:
         match_order = match_order.filter(Transaction.symbol == symbol,
                                          Transaction.limit > limit,
                                          Transaction.amount > 0,
                                          Status.name == 'open')
-    match_order = match_order.order_by(Transaction.limit.desc(), Status.time).all()
+        match_order = match_order.order_by(Transaction.limit.desc(), Status.time).all()
     print("check match order")
     print_matching_order(match_order)
     return match_order
@@ -124,7 +125,7 @@ def execute_order(uid, sym, amt, price):
         raise ValueError(
             "Current order is not open")
     match_order = check_matching_order(
-        session, current_transaction.amount, current_transaction.symbol, current_transaction.limit)
+        session, current_transaction.uid, current_transaction.amount, current_transaction.symbol, current_transaction.limit)
     execute_match_order(session, match_order, current_order.sid)
     session.commit()
     session.close()

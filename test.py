@@ -38,8 +38,8 @@ def testMatch():
     addTranscation(6, 'Y', 400, 125)
     addTranscation(7, 'X', 300, 125)
     # execute_order(6)
-    addTranscation(7, 'X', -400, 120)
-    execute_order(7, 'X', -400, 120)
+    addTranscation(7, 'X', -400, 124)
+    execute_order(7, 'X', -400, 124)
 
 
 def testParseMatch():
@@ -148,8 +148,8 @@ def main():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
-    # testMatch()
-    testParse()
+    testMatch()
+    #testParse()
     # testAdd()
     # testParseMatch()
 
