@@ -1,5 +1,16 @@
 import socket
 from parse import *
+from multiprocessing import Process
+
+def handle_client_xml(client_socket):
+    data = client_socket.recv(1024)
+    received_request = data.decode()
+    print('Received xml:', received_request)
+    response = parsing_XML(received_request)
+
+    # send a response back to the client
+    client_socket.sendall(response.encode())
+    client_socket.close()
 
 # create a TCP socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,14 +31,9 @@ while(1):
     print('Connected by', client_address)
 
     # receive data from the client
-    data = client_socket.recv(1024)
-    received_request = data.decode()
-    print('Received xml:', received_request)
-    response = parsing_XML(received_request)
-
-    # send a response back to the client
-    client_socket.sendall(response.encode())
+    p = Process(target=handle_client_xml, args=(client_socket,))
+    p.start()
+    p.join()
 
 # close the connection
-client_socket.close()
 server_socket.close()
