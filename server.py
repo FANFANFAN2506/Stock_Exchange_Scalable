@@ -1,4 +1,5 @@
 import socket
+from parse import *
 
 # create a TCP socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,10 +21,11 @@ while(1):
 
     # receive data from the client
     data = client_socket.recv(1024)
-    print('Received data:', data.decode())
+    received_request = data.decode()
+    print('Received xml:', received_request)
+    response = parsing_XML(received_request)
 
     # send a response back to the client
-    response = 'Hello from the server'
     client_socket.sendall(response.encode())
 
 # close the connection

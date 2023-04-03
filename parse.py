@@ -111,4 +111,5 @@ def parsing_XML(request):
         handle_create(root, response)
     else:
         handle_transcation(root, response)
-    print(ET.tostring(response).decode())
+    #print(ET.tostring(response).decode())
+    return ET.tostring(response).decode()
