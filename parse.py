@@ -112,3 +112,4 @@ def parsing_XML(request):
     else:
         handle_transcation(root, response)
     print(ET.tostring(response).decode())
+    return ET.tostring(response).decode()
