@@ -33,8 +33,8 @@ def print_current_symbol_status():
 def check_matching_order(session, uid, amount, symbol, limit):
     match_order = session.query(Status).join(
         Transaction).filter(Status.tid == Transaction.tid, Transaction.uid != uid)
-    print("before matching")
-    print_matching_order(match_order)
+    # print("before matching")
+    # print_matching_order(match_order)
     if amount == 0:
         raise ValueError(
             "Order amount cannot be 0")
@@ -44,23 +44,25 @@ def check_matching_order(session, uid, amount, symbol, limit):
                                          Transaction.limit < limit,
                                          Transaction.amount < 0,
                                          Status.name == 'open')
-        match_order = match_order.order_by(Transaction.limit, Status.time).all()
+        match_order = match_order.order_by(
+            Transaction.limit, Status.time).all()
     # if it is a sell order, matching order will be buy orders with limit higher than this sell order's limit
     else:
         match_order = match_order.filter(Transaction.symbol == symbol,
                                          Transaction.limit > limit,
                                          Transaction.amount > 0,
                                          Status.name == 'open')
-        match_order = match_order.order_by(Transaction.limit.desc(), Status.time).all()
-    print("check match order")
-    print_matching_order(match_order)
+        match_order = match_order.order_by(
+            Transaction.limit.desc(), Status.time).all()
+    # print("check match order")
+    # print_matching_order(match_order)
     return match_order
 
 
 def execute_match_order(session, match_order, current_order_sid):
     current_order = session.query(Status).filter(
         Status.sid == current_order_sid).first()
-    print("In total matching order", len(match_order))
+    # print("In total matching order", len(match_order))
     for order in match_order:
         if abs(order.shares) == abs(current_order.shares):
             match_order_status = session.query(Status).filter(
@@ -71,7 +73,7 @@ def execute_match_order(session, match_order, current_order_sid):
             current_order.price = match_order_status.price
             current_order.time = getCurrentTime()
             session.commit()
-            print_current_symbol_status()
+            # print_current_symbol_status()
             break
         elif abs(order.shares) > abs(current_order.shares):
             match_order_status = session.query(Status).filter(
@@ -87,7 +89,7 @@ def execute_match_order(session, match_order, current_order_sid):
             current_order.price = match_order_status.price
             current_order.time = getCurrentTime()
             session.commit()
-            print_current_symbol_status()
+            # print_current_symbol_status()
             break
         else:
             match_order_status = session.query(Status).filter(
@@ -102,7 +104,7 @@ def execute_match_order(session, match_order, current_order_sid):
                                              time=getCurrentTime())
             session.add(current_executed_status)
             session.commit()
-            print_current_symbol_status()
+            # print_current_symbol_status()
 
 
 def execute_order(uid, sym, amt, price):
@@ -120,8 +122,8 @@ def execute_order(uid, sym, amt, price):
         raise ValueError(
             "Cannot find current status")
     if current_order.name != 'open':
-        print(current_order.sid, current_order.tid, current_order.name,
-              current_order.shares, current_order.price, current_order.time)
+        # print(current_order.sid, current_order.tid, current_order.name,
+        #       current_order.shares, current_order.price, current_order.time)
         raise ValueError(
             "Current order is not open")
     match_order = check_matching_order(
