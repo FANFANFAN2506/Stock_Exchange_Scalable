@@ -41,17 +41,18 @@ def order_Transcation(root, child, response):
         response.append(construct_node('error', str(e), **attributes))
 
 
-def query_Transcation(child, response):
-    response.append(query_transcation(int(child.attrib['id'])))
+def query_Transcation(root, child, response):
+    response.append(query_transcation(
+        int(root.attrib['id']), int(child.attrib['id'])))
 
 
-def cancel_Transcation(child, response):
+def cancel_Transcation(root, child, response):
     cancel_node = ET.Element("canceled")
     cancel_node.set('id', str(child.attrib['id']))
     Session = sessionmaker(bind=engine)
     session = Session()
-    all_status = session.query(Status).join(Transaction).filter(
-        Transaction.tid == child.attrib['id'])
+    all_status = session.query(Status).join(Transaction).join(Account).filter(
+        Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id'])
     if all_status.count() == 0:
         Msg = "Transcation id doesn't exist"
         attributes = {'id': str(child.attrib['id'])}
@@ -61,8 +62,8 @@ def cancel_Transcation(child, response):
     open_status.name = 'canceled'
     open_status.time = getCurrentTime()
     session.commit()
-    order = session.query(Status).join(Transaction).filter(
-        Transaction.tid == child.attrib['id']).order_by(Status.sid.asc())
+    order = session.query(Status).join(Transaction).join(Account).filter(
+        Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id']).order_by(Status.sid.asc())
     query_status(cancel_node, order)
     response.append(cancel_node)
     session.close()
@@ -93,10 +94,10 @@ def handle_transcation(root, response):
             if child.tag == 'order':
                 order_Transcation(root, child, response)
             elif child.tag == 'query':
-                query_Transcation(child, response)
+                query_Transcation(root, child, response)
             else:
                 # cancle order
-                cancel_Transcation(child, response)
+                cancel_Transcation(root, child, response)
     except Exception as e:
         for child in root:
             attributes = {'id': str(root.attrib['id'])}
@@ -111,9 +112,5 @@ def parsing_XML(request):
         handle_create(root, response)
     else:
         handle_transcation(root, response)
-<<<<<<< HEAD
     print(ET.tostring(response).decode())
-=======
-    #print(ET.tostring(response).decode())
->>>>>>> a42fe162961505d5d391cf9294ae8b2b1ee7e9f3
     return ET.tostring(response).decode()

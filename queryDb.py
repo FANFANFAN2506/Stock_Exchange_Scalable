@@ -21,13 +21,13 @@ def query_status(node, order):
                 'executed', None, **attributes))
 
 
-def query_transcation(TID):
+def query_transcation(UID, TID):
     status_node = ET.Element("status")
     status_node.set('id', str(TID))
     Session = sessionmaker(bind=engine)
     session = Session()
-    order = session.query(Status).join(Transaction).filter(
-        Transaction.tid == TID).order_by(Status.sid.asc())
+    order = session.query(Status).join(Transaction).join(Account).filter(
+        Account.id == UID).filter(Transaction.tid == TID).order_by(Status.sid.asc())
     if order.count() == 0:
         Msg = 'The transcation ID does not exist'
         attributes = {'id': str(TID)}
