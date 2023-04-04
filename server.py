@@ -11,6 +11,7 @@ def handle_client_xml(client_socket):
     data = client_socket.recv(1024)
     received_request = data.decode()
     # print(f"Received xml {received_request}")
+    received_request = received_request.split("\n")[1]
     Session = sessionmaker(bind=engine)
     session = Session()
     response = parsing_XML(session, received_request)
