@@ -1,6 +1,6 @@
 import socket
 from parse import *
-from multiprocessing import Process, Pool
+from multiprocessing import Pool
 import os
 
 
@@ -9,8 +9,12 @@ def handle_client_xml(client_socket):
     data = client_socket.recv(1024)
     received_request = data.decode()
     # print(f"Received xml {received_request}")
-    response = parsing_XML(received_request)
-
+    engine = create_engine(
+        'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    response = parsing_XML(session, received_request)
+    session.close()
     # send a response back to the client
     client_socket.sendall(response.encode())
     client_socket.close()
@@ -18,6 +22,7 @@ def handle_client_xml(client_socket):
 
 def serverLitsen():
     # create a TCP socket
+    init_Engine()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -32,14 +37,3 @@ def serverLitsen():
         client_socket, addr = server_socket.accept()
         print(f"connected to {addr}")
         pool.apply_async(func=handle_client_xml, args=(client_socket,))
-
-    # while(1):
-    #     # listen for incoming connections
-    #     server_socket.listen(1)
-    #     print('Server is listening on {}:{}'.format(*server_address))
-    #     # receive data from the client
-    #     p = Process(target=handle_client_xml, args=(client_socket,))
-    #     p.start()
-    #     p.join()
-    #     #   close the connection
-    # server_socket.close()

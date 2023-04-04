@@ -1,5 +1,4 @@
-from sqlalchemy.orm import sessionmaker
-# from sqlalchemy import create_engine, MetaData, Table, select
+from sqlalchemy import update
 from dbTable import *
 from utils import *
 
@@ -9,7 +8,8 @@ def checkIfAccountExist(session, UID):
     if int(UID) < 1:
         raise ValueError(
             "Account ID shouldn't be less than 1")
-    account = session.query(Account).filter(Account.id == UID).first()
+    account = session.query(Account).filter(
+        Account.id == UID).with_for_update().first()
     if account is None:
         raise ValueError("Account doesn't exist")
     return account
@@ -20,7 +20,7 @@ def checkSymbolName(symbol):
         raise ValueError("Symbol shouldn't be empty")
 
 
-def addAccount(ID, BALANCE):
+def addAccount(session, ID, BALANCE):
     # Make sure ID is larger and equal than 1
     if ID < 1:
         raise ValueError(
@@ -29,9 +29,6 @@ def addAccount(ID, BALANCE):
     if BALANCE < 0:
         raise ValueError(
             "Account Balance shouldn't be negative")
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
     # Check if ID exist:
     account = session.query(Account).filter(Account.id == ID).first()
     if account is not None:
@@ -39,13 +36,9 @@ def addAccount(ID, BALANCE):
     account = Account(id=ID, balance=BALANCE)
     session.add(account)
     session.commit()
-    session.close()
 
 
-def addPosition(account_ID, sym, num):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
+def addPosition(session, account_ID, sym, num):
     # If the account doesn't exist
     checkIfAccountExist(session, account_ID)
 
@@ -53,21 +46,21 @@ def addPosition(account_ID, sym, num):
         raise ValueError("The position should be positive")
     # check if the symbol already exist
     check_sym = session.query(Position).filter(
-        Position.uid == account_ID).filter(Position.symbol == sym).first()
+        Position.uid == account_ID).filter(Position.symbol == sym).with_for_update().first()
     if check_sym is None:
         # The symbol doesn't exist, add a new one
         position = Position(uid=account_ID, symbol=sym, amount=num)
         session.add(position)
     else:
         # Else update the amount
+        # new_amount = check_sym.amount + num
+        # session.execute(update(Position).where(
+        #     Position.uid == account_ID).filter(Position.symbol == sym).values(amount=new_amount))
         check_sym.amount += num
     session.commit()
-    session.close()
 
 
-def addTranscation(uid, sym, amt, price):
-    Session = sessionmaker(bind=engine)
-    session = Session()
+def addTranscation(session, uid, sym, amt, price):
     # If the account doesn't exist
     account = checkIfAccountExist(session, uid)
 
@@ -81,7 +74,7 @@ def addTranscation(uid, sym, amt, price):
     else:
         # It is a sell order:
         if_position = session.query(Position).filter(
-            Position.uid == uid).filter(Position.symbol == sym).first()
+            Position.uid == uid).filter(Position.symbol == sym).with_for_update().first()
         if if_position is None:
             # The symbol doesn't exist
             raise ValueError(
@@ -98,25 +91,12 @@ def addTranscation(uid, sym, amt, price):
     status = Status(tid=transaction.tid, name='open',
                     shares=amt, price=price, time=getCurrentTime())
     session.add(status)
-
     session.commit()
-    session.close()
 
 
-def addStatus(tid, name, shares, price, time):
+def addStatus(session, tid, name, shares, price, time):
     # When we need to add status, we need to check the id before call this function
-    Session = sessionmaker(bind=engine)
-    session = Session()
     status = Status(tid=tid, name=name, shares=shares, price=price, time=time)
     session.add(status)
     session.commit()
-    session.close()
-
-
-def checkTime():
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    saved_time = session.query(Status).first()
-    # Convert datetime into seconds since epocha
-    print(int(saved_time.time.timestamp()))
+    # session.close()

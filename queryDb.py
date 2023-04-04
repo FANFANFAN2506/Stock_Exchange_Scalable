@@ -21,11 +21,9 @@ def query_status(node, order):
                 'executed', None, **attributes))
 
 
-def query_transcation(UID, TID):
+def query_transcation(session, UID, TID):
     status_node = ET.Element("status")
     status_node.set('id', str(TID))
-    Session = sessionmaker(bind=engine)
-    session = Session()
     order = session.query(Status).join(Transaction).join(Account).filter(
         Account.id == UID).filter(Transaction.tid == TID).order_by(Status.sid.asc())
     if order.count() == 0:
@@ -34,5 +32,4 @@ def query_transcation(UID, TID):
         return construct_node('error', Msg, **attributes)
     else:
         query_status(status_node, order)
-    session.close()
     return status_node

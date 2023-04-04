@@ -3,6 +3,36 @@ import xml.etree.ElementTree as ET
 from dbTable import *
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select, Table, MetaData
+from sqlalchemy import create_engine
+''' 
+@func: Drop all the tables
+'''
+
+
+def init_Engine():
+    engine = create_engine(
+        'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
+    print('Opened database successfully')
+    Base.metadata.drop_all(engine)
+    print('Drop tables successfully')
+    Base.metadata.create_all(engine)
+
+
+def createEngine():
+    engine = create_engine(
+        'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
+    print('Opened database successfully')
+    Base.metadata.drop_all(engine)
+    print('Drop tables successfully')
+    Base.metadata.create_all(engine)
+    Session = sessionmaker()
+    session = Session()
+    return session
+
+
+''' 
+@func: Get current time
+'''
 
 
 def getCurrentTime():
@@ -34,7 +64,7 @@ def construct_node(Name, Msg, **attributes):
 '''
 
 
-def printAccountPosition():
+def printAccountPosition(engine):
     Session = sessionmaker(bind=engine)
     session = Session()
     metadata = MetaData()
@@ -59,7 +89,7 @@ def printquery(session, query):
         print()
 
 
-def printOrderStatus():
+def printOrderStatus(engine):
     Session = sessionmaker(bind=engine)
     session = Session()
     metadata = MetaData()
