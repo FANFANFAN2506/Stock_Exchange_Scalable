@@ -1,8 +1,12 @@
 Connected to ('localhost', 12345)
 Request sent
+<<<<<<< HEAD
 Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><error sym="TESLA" id="1">(psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "position_pkey"
 DETAIL:  Key (uid, symbol)=(1, TESLA) already exists.
 
 [SQL: INSERT INTO position (uid, symbol, amount) VALUES (%(uid)s, %(symbol)s, %(amount)s)]
 [parameters: {'uid': '1', 'symbol': 'TESLA', 'amount': 200}]
 (Background on this error at: https://sqlalche.me/e/20/gkpj)</error></result>
+=======
+Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><created sym="X" id="1" /><created sym="X" id="2" /><created sym="TESLA" id="1" /><created sym="TESLA" id="2" /></result>
+>>>>>>> 6b5bede15771adea22de7095a2427dfc08a8a7c5

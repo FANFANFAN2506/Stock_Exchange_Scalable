@@ -30,7 +30,7 @@ def print_current_symbol_status(session):
 
 def check_matching_order(session, uid, amount, symbol, limit):
     match_order = session.query(Status).join(
-        Transaction).filter(Status.tid == Transaction.tid, Transaction.uid != uid)
+        Transaction).filter(Status.tid == Transaction.tid)
     # print("before matching")
     # print_matching_order(match_order)
     if amount == 0:

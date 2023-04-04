@@ -1,8 +1,6 @@
 from sqlalchemy import update
 from dbTable import *
 from utils import *
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import FlushError
 
 
 def checkIfAccountExist(session, UID):
@@ -24,7 +22,8 @@ def checkSymbolName(symbol):
         raise ValueError("Symbol shouldn't be empty")
 
 
-def addAccount(session, ID, BALANCE):
+def addAccount(ID, BALANCE):
+    session1 = Session()
     # Make sure ID is larger and equal than 1
     if ID < 1:
         raise ValueError(
@@ -34,36 +33,49 @@ def addAccount(session, ID, BALANCE):
         raise ValueError(
             "Account Balance shouldn't be negative")
     # Check if ID exist:
-    account = session.query(Account).filter(Account.id == ID).first()
+    account = session1.query(Account).filter(Account.id == ID).first()
     if account is not None:
         raise ValueError("Account ID exists")
-    account = Account(id=ID, balance=BALANCE)
-    session.add(account)
-    session.commit()
+    try:
+        account = Account(id=ID, balance=BALANCE)
+        session1.add(account)
+        session1.commit()
+        session1.close()
+    except:
+        session1.flush()
+        raise ValueError("Accounts exists")
 
 
 def addPosition(session, account_ID, sym, num):
+    session1 = Session()
     # If the account doesn't exist
-    checkIfAccountExist(session, account_ID)
+    checkIfAccountExist(session1, account_ID)
     if num < 0:
         raise ValueError("The position should be positive")
     # check if the symbol already exist
-    check_sym = session.query(Position).filter(
-        Position.uid == account_ID).filter(Position.symbol == sym).with_for_update().first()
-    if check_sym is None:
-        # The symbol doesn't exist, add a new one
-        position = Position(uid=account_ID, symbol=sym, amount=num)
-        session.add(position)
-    else:
-        # Else update the amount
-        # new_amount = check_sym.amount + num
-        # session.execute(update(Position).where(
-        #     Position.uid == account_ID).filter(Position.symbol == sym).values(amount=new_amount))
-        check_sym.amount += num
-    session.commit()
+    try:
+        check_sym = session1.query(Position).filter(
+            Position.uid == account_ID).filter(Position.symbol == sym).with_for_update().first()
+        if check_sym is None:
+            # The symbol doesn't exist, add a new one
+            position = Position(uid=account_ID, symbol=sym, amount=num)
+            session1.add(position)
+        else:
+            # Else update the amount
+            # new_amount = check_sym.amount + num
+            # session.execute(update(Position).where(
+            #     Position.uid == account_ID).filter(Position.symbol == sym).values(amount=new_amount))
+            check_sym.amount += num
+        session1.commit()
+        session1.close()
+    except:
+        print("rollback")
+        session1.rollback()
+        session1.close()
 
 
-def addTranscation(session, uid, sym, amt, price):
+def addTranscation(uid, sym, amt, price):
+    session = Session()
     # If the account doesn't exist
     checkIfAccountExist(session, uid)
 
@@ -97,6 +109,7 @@ def addTranscation(session, uid, sym, amt, price):
                     shares=amt, price=price, time=getCurrentTime())
     session.add(status)
     session.commit()
+    session.close()
 
 
 def addStatus(session, tid, name, shares, price, time):
