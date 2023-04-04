@@ -5,9 +5,10 @@ import os
 
 
 def handle_client_xml(client_socket):
+    print(f"Run on {os.getpid()}, waiting for message")
     data = client_socket.recv(1024)
     received_request = data.decode()
-    print(f"Received xml {received_request} on {os.getpid()}")
+    # print(f"Received xml {received_request}")
     response = parsing_XML(received_request)
 
     # send a response back to the client
@@ -25,11 +26,12 @@ def serverLitsen():
     server_address = ('localhost', 12345)
     print('Server is listening on {}:{}'.format(*server_address))
     server_socket.bind(server_address)
-    pool = Pool(5)
+    pool = Pool(2)
     server_socket.listen(20)
     while(1):
         client_socket, addr = server_socket.accept()
-        pool.apply_async(func=handle_client_xml, args=(client_socket))
+        print(f"connected to {addr}")
+        pool.apply_async(func=handle_client_xml, args=(client_socket,))
 
     # while(1):
     #     # listen for incoming connections
