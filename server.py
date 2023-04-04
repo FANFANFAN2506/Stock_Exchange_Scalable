@@ -26,7 +26,7 @@ def initializer():
 
 def serverLitsen():
     # create a TCP socket
-    pool = Pool(2, initializer=initializer)
+    pool = Pool(4, initializer=initializer)
     init_Engine()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

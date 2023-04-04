@@ -1,4 +1,4 @@
-from sqlalchemy import update
+from match_price import *
 from dbTable import *
 from utils import *
 
@@ -109,6 +109,8 @@ def addTranscation(uid, sym, amt, price):
                     shares=amt, price=price, time=getCurrentTime())
     session.add(status)
     session.commit()
+    execute_order(session, int(uid), sym, int(
+        amt), float(price))
     session.close()
 
 
