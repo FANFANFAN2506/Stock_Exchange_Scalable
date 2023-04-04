@@ -1,3 +1,3 @@
 Connected to ('localhost', 12345)
 Request sent
-Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><created sym="X" id="1" /><created sym="X" id="2" /><created sym="TESLA" id="1" /><created sym="TESLA" id="2" /></result>
+Received data: 
