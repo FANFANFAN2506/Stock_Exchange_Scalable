@@ -1,9 +1,13 @@
 from sqlalchemy import Integer, Float, Column, String, ForeignKey, TEXT, TIMESTAMP
 from sqlalchemy.orm import declarative_base
-# from sqlalchemy import create_engine
-# engine = create_engine(
-#     'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
-# print("engine setup")
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool
+engine = create_engine(
+    'postgresql://postgres:passw0rd@localhost:5432/hw4_568')
+Session = sessionmaker(bind=engine)
+
+
 Base = declarative_base()
 
 
@@ -17,7 +21,8 @@ class Account(Base):
 class Position(Base):
     __tablename__ = 'position'
 
-    uid = Column(Integer, ForeignKey('account.id'), primary_key=True)
+    uid = Column(Integer, ForeignKey('account.id'),
+                 primary_key=True)
     symbol = Column(TEXT, primary_key=True)
     amount = Column(Integer, autoincrement=False)
 

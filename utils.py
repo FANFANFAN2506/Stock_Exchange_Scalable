@@ -11,7 +11,7 @@ from sqlalchemy import create_engine
 
 def init_Engine():
     engine = create_engine(
-        'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
+        'postgresql://postgres:passw0rd@localhost:5432/hw4_568')
     print('Opened database successfully')
     Base.metadata.drop_all(engine)
     print('Drop tables successfully')

@@ -72,7 +72,7 @@ def handle_create(session, root, response):
         if child.tag == 'account':
             attributes = {'id': child.attrib['id']}
             try:
-                addAccount(session, int(child.attrib['id']), int(
+                addAccount(int(child.attrib['id']), int(
                     child.attrib['balance']))
                 response.append(construct_node('created', None, **attributes))
             except Exception as e:
