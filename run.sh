@@ -7,7 +7,7 @@
 for i in {1..2}
 do
     echo "Client $i started with PID: $pid"
-    python3 client.py > outcome.txt &
+    python3 client.py > outcome$i.txt &
     # python3 client.py
 done
 
