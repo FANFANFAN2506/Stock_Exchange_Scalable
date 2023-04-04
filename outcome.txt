@@ -1,5 +1,6 @@
 Connected to ('localhost', 12345)
 Request sent
+<<<<<<< HEAD
 Received data: <result><error id="1">(psycopg2.errors.SerializationFailure) could not serialize access due to read/write dependencies among transactions
 DETAIL:  Reason code: Canceled on identification as a pivot, during write.
 HINT:  The transaction might succeed if retried.
@@ -7,6 +8,9 @@ HINT:  The transaction might succeed if retried.
 [SQL: INSERT INTO account (id, balance) VALUES (%(id)s, %(balance)s)]
 [parameters: {'id': 1, 'balance': 50000}]
 (Background on this error at: https://sqlalche.me/e/20/e3q8)</error><created id="2" /><error sym="TESLA" id="1">(psycopg2.errors.SerializationFailure) could not serialize access due to read/write dependencies among transactions
+=======
+Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><error sym="TESLA" id="1">(psycopg2.errors.SerializationFailure) could not serialize access due to read/write dependencies among transactions
+>>>>>>> 83785f95cad112c9e985275c139bb993aa107245
 DETAIL:  Reason code: Canceled on identification as a pivot, during write.
 HINT:  The transaction might succeed if retried.
 

@@ -11,40 +11,48 @@ import time
 
 
 def testMatch():
-    addAccount(1, 100000)
-    addAccount(2, 100000)
-    addAccount(3, 100000)
-    addAccount(4, 100000)
-    addAccount(5, 100000)
-    addAccount(6, 100000)
-    addAccount(7, 100000)
-    addPosition(1, 'X', 500)
-    addPosition(2, 'X', 500)
-    addPosition(3, 'X', 500)
-    addPosition(4, 'X', 500)
-    addPosition(5, 'X', 500)
-    addPosition(6, 'X', 500)
-    addPosition(7, 'X', 500)
-    addPosition(6, 'Y', 500)
+    session = createEngine()
+    addAccount(session, 1, 100000)
+    addAccount(session, 2, 100000)
+    addAccount(session, 3, 100000)
+    addAccount(session, 4, 100000)
+    addAccount(session, 5, 100000)
+    addAccount(session, 6, 100000)
+    addAccount(session, 7, 100000)
+    addPosition(session, 1, 'X', 500)
+    addPosition(session, 2, 'X', 500)
+    addPosition(session, 3, 'X', 500)
+    addPosition(session, 4, 'X', 500)
+    addPosition(session, 5, 'X', 500)
+    addPosition(session, 6, 'X', 500)
+    addPosition(session, 7, 'X', 500)
+    addPosition(session, 6, 'Y', 500)
 
-    addTranscation(1, 'X', 300, 125)
+    addTranscation(session, 1, 'X', 300, 125)
     # execute_order(1)
-    addTranscation(2, 'X', -100, 130)
-    addTranscation(3, 'X', 200, 127)
+    addTranscation(session, 2, 'X', -100, 130)
+    addTranscation(session, 3, 'X', 200, 127)
     # execute_order(3)
-    addTranscation(4, 'X', -500, 128)
-    addTranscation(5, 'X', -200, 140)
+    addTranscation(session, 4, 'X', -500, 128)
+    addTranscation(session, 5, 'X', -200, 140)
     time.sleep(1)
-    addTranscation(6, 'X', 400, 125)
+    addTranscation(session, 6, 'X', 400, 125)
     time.sleep(1)
-    addTranscation(6, 'Y', 400, 125)
-    addTranscation(7, 'X', 300, 125)
+    addTranscation(session, 6, 'Y', 400, 125)
+    addTranscation(session, 7, 'X', 300, 125)
     # execute_order(6)
-    addTranscation(7, 'X', -400, 124)
-    execute_order(7, 'X', -400, 124)
+    addTranscation(session, 7, 'X', -400, 124)
+    execute_order(session, 7, 'X', -400, 124)
+    session.close()
 
 
 def testParseMatch():
+    engine = create_engine(
+        'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
     print("----Test 1----")
     xmlString = "<create><account id=\"1\" balance=\"100000\"/><account id=\"2\" balance=\"100000\"/><account id=\"3\" balance=\"100000\"/><account id=\"4\" balance=\"100000\"/><account id=\"5\" balance=\"100000\"/><account id=\"6\" balance=\"100000\"/><account id=\"7\" balance=\"100000\"/>"
     xmlString += "<symbol sym=\"X\"><account id=\"1\">500</account><account id=\"2\">500</account><account id=\"3\">500</account><account id=\"4\">500</account><account id=\"5\">500</account><account id=\"6\">500</account><account id=\"7\">500</account></symbol></create>"
@@ -56,21 +64,22 @@ def testParseMatch():
     xmlString6 = "<transactions id=\"6\"><order sym=\"X\" amount=\"400\" limit=\"125\"/></transactions>"
     xmlString7 = "<transactions id=\"7\"><order sym=\"X\" amount=\"-400\" limit=\"124\"/></transactions>"
     print("Before matching:")
-    parsing_XML(xmlString)
-    parsing_XML(xmlString1)
-    parsing_XML(xmlString2)
-    parsing_XML(xmlString3)
-    parsing_XML(xmlString4)
-    parsing_XML(xmlString5)
-    parsing_XML(xmlString6)
-    printAccountPosition()
-    printOrderStatus()
+    parsing_XML(session, xmlString)
+    parsing_XML(session, xmlString1)
+    parsing_XML(session, xmlString2)
+    parsing_XML(session, xmlString3)
+    parsing_XML(session, xmlString4)
+    parsing_XML(session, xmlString5)
+    parsing_XML(session, xmlString6)
+    printAccountPosition(engine)
+    printOrderStatus(engine)
     print("New order:")
     print(xmlString7)
-    parsing_XML(xmlString7)
+    parsing_XML(session, xmlString7)
     print("After matching:")
-    printAccountPosition()
-    printOrderStatus()
+    printAccountPosition(engine)
+    printOrderStatus(engine)
+    session.close()
 
 
 ''' 
@@ -79,12 +88,13 @@ def testParseMatch():
 
 
 def testParse():
+    session = createEngine()
     print("----Test 1 Failed: Account exist is 0, balance is negative, account does not exist----")
     xmlString = "<create><account id=\"0\" balance=\"50000\"/><account id=\"2\" balance=\"-100000\"/><symbol sym=\"TESLA\"><account id=\"1\">200</account></symbol></create>"
     print("Request:")
     print(xmlString)
     print("Response:")
-    parsing_XML(xmlString)
+    parsing_XML(session, xmlString)
     print("")
     print("----Test 2 Failed: Query number and cancel number does not exist----")
     xmlString2 = "<create><account id=\"1\" balance=\"50000\"/><symbol sym=\"TESLA\"><account id=\"1\">500</account></symbol></create>"
@@ -93,8 +103,8 @@ def testParse():
     print(xmlString2)
     print(xmlString3)
     print("Response:")
-    parsing_XML(xmlString2)
-    parsing_XML(xmlString3)
+    parsing_XML(session, xmlString2)
+    parsing_XML(session, xmlString3)
     print("")
     print("----Test 3 Failed: Trasaciton account id doesn't exsit, transcation doesn't belong to account----")
     xmlString8 = "<transactions id=\"1000\"><order sym=\"TESLA\" amount=\"100\" limit=\"250\"/><query id=\"1\"/><cancel id=\"1\"/></transactions>"
@@ -103,8 +113,8 @@ def testParse():
     print(xmlString8)
     print(xmlString7)
     print("Response:")
-    parsing_XML(xmlString8)
-    parsing_XML(xmlString7)
+    parsing_XML(session, xmlString8)
+    parsing_XML(session, xmlString7)
     print("")
     print("----Test 4 Success: Open a order, query it, then delete it and query again----")
     xmlString4 = "<create><account id=\"2\" balance=\"50000\"/><symbol sym=\"TESLA\"><account id=\"2\">500</account></symbol></create>"
@@ -117,13 +127,14 @@ def testParse():
     print(xmlString6)
     print(xmlString9)
     print("Response:")
-    parsing_XML(xmlString4)
-    parsing_XML(xmlString5)
+    parsing_XML(session, xmlString4)
+    parsing_XML(session, xmlString5)
     time.sleep(1)
-    addStatus(1, 'executed', 50, 250, getCurrentTime())
-    parsing_XML(xmlString6)
+    addStatus(session, 1, 'executed', 50, 250, getCurrentTime())
+    parsing_XML(session, xmlString6)
     time.sleep(1)
-    parsing_XML(xmlString9)
+    parsing_XML(session, xmlString9)
+    session.close()
 
 
 ''' 
@@ -132,40 +143,41 @@ def testParse():
 
 
 def testAdd():
-
+    session = createEngine()
     try:
         print("----Test 1 Failed: Account exist----")
-        addAccount(1, 100000)
-        addAccount(1, 200)
+        addAccount(session, 1, 100000)
+        addAccount(session, 1, 200)
     except Exception as e:
         print(e)
 
     print("")
     try:
         print("----Test 2 Failed: Balance not sufficient----")
-        addPosition(1, 'T5asdf', 200)
-        addPosition(1, 'T5asdf', 300)
-        addTranscation(1, 'T5asdf', 400, 125)
-        addTranscation(1, 'T5asdf', 400, 125)
-        addTranscation(1, 'T5asdf', 200, 125)
+        addPosition(session, 1, 'T5asdf', 200)
+        addPosition(session, 1, 'T5asdf', 300)
+        addTranscation(session, 1, 'T5asdf', 400, 125)
+        addTranscation(session, 1, 'T5asdf', 400, 125)
+        addTranscation(session, 1, 'T5asdf', 200, 125)
 
     except Exception as e:
         print(e)
 
     print("")
     try:
-        print("----Test 3 Failed: amount not sufficient----")
-        addAccount(2, 200)
-        addPosition(2, 'T5asdf', 200)
-        addTranscation(2, 'T5asdf', -400, 125)
+        print("----Test 3 Failed: Amount not sufficient----")
+        addAccount(session, 2, 200)
+        addPosition(session, 2, 'T5asdf', 200)
+        addTranscation(session, 2, 'T5asdf', -400, 125)
     except Exception as e:
         print(e)
     try:
-        addPosition(1, 'S&P', 300)
-        addPosition(1, 'BTC', 100)
-        addStatus(1, 'executed', 100, 100, getCurrentTime())
+        addPosition(session, 1, 'S&P', 300)
+        addPosition(session, 1, 'BTC', 100)
+        addStatus(session, 1, 'executed', 100, 100, getCurrentTime())
     except Exception as e:
         print(e)
+    session.close()
 
 
 def testSocket():
@@ -174,15 +186,6 @@ def testSocket():
 
 def main():
     # Check if connected to the database
-    try:
-        C_success = engine.connect()
-        print('Opened database successfully')
-        C_success.close()
-    except Exception as e:
-        print("Can't open database", e)
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-
     # testMatch()
     # testParse()
     # testAdd()

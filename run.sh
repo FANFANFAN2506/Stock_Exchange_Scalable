@@ -6,9 +6,9 @@
 # sleep 1
 for i in {1..2}
 do
-    # echo "Client $i started with PID: $pid"
-    # python3 client.py > outcome.txt &
-    python3 client.py
+    echo "Client $i started with PID: $pid"
+    python3 client.py > outcome.txt &
+    # python3 client.py
 done
 
 # kill $pid

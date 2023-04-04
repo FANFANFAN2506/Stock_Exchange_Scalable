@@ -11,9 +11,7 @@ def print_matching_order(match_order):
     print()
 
 
-def print_current_symbol_status():
-    Session = sessionmaker(bind=engine)
-    session = Session()
+def print_current_symbol_status(session):
     symbol = 'X'
     all_transaction = session.query(Transaction).filter(
         Transaction.symbol == symbol)
@@ -27,7 +25,7 @@ def print_current_symbol_status():
     for status in all_status:
         print(status.sid, status.tid, status.name,
               status.shares, status.price, status.time)
-    session.close()
+    # session.close()
 
 
 def check_matching_order(session, uid, amount, symbol, limit):
@@ -107,9 +105,7 @@ def execute_match_order(session, match_order, current_order_sid):
             # print_current_symbol_status()
 
 
-def execute_order(uid, sym, amt, price):
-    Session = sessionmaker(bind=engine)
-    session = Session()
+def execute_order(session, uid, sym, amt, price):
     current_transaction = session.query(Transaction).filter(Transaction.uid == uid,
                                                             Transaction.symbol == sym,
                                                             Transaction.amount == amt,
@@ -130,4 +126,3 @@ def execute_order(uid, sym, amt, price):
         session, current_transaction.uid, current_transaction.amount, current_transaction.symbol, current_transaction.limit)
     execute_match_order(session, match_order, current_order.sid)
     session.commit()
-    session.close()
