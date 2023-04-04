@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 engine = create_engine(
     'postgresql://postgres:passw0rd@localhost:5432/hw4_568', poolclass=NullPool, isolation_level='SERIALIZABLE')
-print("engine setup")
 Base = declarative_base()
 
 
