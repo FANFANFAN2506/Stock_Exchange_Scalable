@@ -1,4 +1,4 @@
 engine setup
 Connected to ('localhost', 12345)
 Request sent
-Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><created sym="TESLA" id="1" /></result>
+Received data: <result><created id="1" /><created id="2" /><created sym="TESLA" id="1" /></result>

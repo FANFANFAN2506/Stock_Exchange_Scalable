@@ -3,14 +3,14 @@ from parse import *
 from multiprocessing import Pool
 import os
 
+engine = create_engine(
+        'postgresql://postgres:passw0rd@localhost:5432/hw4_568')
 
 def handle_client_xml(client_socket):
     print(f"Run on {os.getpid()}, waiting for message")
     data = client_socket.recv(1024)
     received_request = data.decode()
     # print(f"Received xml {received_request}")
-    engine = create_engine(
-        'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
     Session = sessionmaker(bind=engine)
     session = Session()
     response = parsing_XML(session, received_request)
@@ -19,9 +19,14 @@ def handle_client_xml(client_socket):
     client_socket.sendall(response.encode())
     client_socket.close()
 
+def initializer():
+    """ensure the parent proc's database connections are not touched
+    in the new connection pool"""
+    engine.dispose(close=False)
 
 def serverLitsen():
     # create a TCP socket
+    pool = Pool(2, initializer = initializer)
     init_Engine()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -31,7 +36,6 @@ def serverLitsen():
     server_address = ('localhost', 12345)
     print('Server is listening on {}:{}'.format(*server_address))
     server_socket.bind(server_address)
-    pool = Pool(2)
     server_socket.listen(20)
     while(1):
         client_socket, addr = server_socket.accept()

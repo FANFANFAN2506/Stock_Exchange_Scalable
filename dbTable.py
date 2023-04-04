@@ -1,9 +1,9 @@
 from sqlalchemy import Integer, Float, Column, String, ForeignKey, TEXT, TIMESTAMP
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import create_engine
-engine = create_engine(
-    'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
-print("engine setup")
+# from sqlalchemy import create_engine
+# engine = create_engine(
+#     'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
+# print("engine setup")
 Base = declarative_base()
 
 
