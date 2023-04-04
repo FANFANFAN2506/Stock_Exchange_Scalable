@@ -195,11 +195,11 @@ def testTrans():
 def main():
     # Check if connected to the database
     # testMatch()
-    testTrans()
+    #testTrans()
     # testParse()
     # testAdd()
     # testParseMatch()
-    # testSocket()
+    testSocket()
 
 
 if __name__ == '__main__':
