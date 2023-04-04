@@ -1,5 +1,6 @@
 Connected to ('localhost', 12345)
 Request sent
+<<<<<<< HEAD
 Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><error id="3">Account ID exists</error><error id="4">Account ID exists</error><error id="5">Account ID exists</error><error id="6">Account ID exists</error><error id="7">Account ID exists</error><created sym="X" id="1" /><created sym="X" id="2" /><created sym="X" id="3" /><created sym="X" id="4" /><created sym="X" id="5" /><created sym="X" id="6" /><created sym="X" id="7" /></result>
 Connected to ('localhost', 12345)
 Request sent
@@ -22,3 +23,6 @@ Received data: <result><error sym="X" amount="400" limit="125">Cannot find curre
 Connected to ('localhost', 12345)
 Request sent
 Received data: <result><error sym="X" amount="-400" limit="124">Cannot find current status</error></result>
+=======
+Received data: 
+>>>>>>> 75e8d7b8e37fd63273167eb9c87a613b622899d8
