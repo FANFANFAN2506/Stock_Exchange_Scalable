@@ -1,0 +1,3 @@
+Connected to ('localhost', 12345)
+Request sent
+Received data: <result><created id="1" /><created id="2" /><created sym="TESLA" id="1" /></result>

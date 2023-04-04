@@ -25,7 +25,7 @@ def createEngine():
     Base.metadata.drop_all(engine)
     print('Drop tables successfully')
     Base.metadata.create_all(engine)
-    Session = sessionmaker()
+    Session = sessionmaker(bind=engine)
     session = Session()
     return session
 

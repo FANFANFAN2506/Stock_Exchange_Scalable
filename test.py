@@ -184,13 +184,22 @@ def testSocket():
     serverLitsen()
 
 
+def testTrans():
+    session = createEngine()
+    addAccount(session, 1, 100000)
+    addPosition(session, 1, 'T5asdf', 200)
+    addPosition(session, 1, 'T5asdf', 300)
+    addTranscation(session, 1, 'T5asdf', 400, 125)
+
+
 def main():
     # Check if connected to the database
     # testMatch()
+    testTrans()
     # testParse()
     # testAdd()
     # testParseMatch()
-    testSocket()
+    # testSocket()
 
 
 if __name__ == '__main__':

@@ -1,6 +1,8 @@
 from sqlalchemy import update
 from dbTable import *
 from utils import *
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import FlushError
 
 
 def checkIfAccountExist(session, UID):
@@ -8,11 +10,13 @@ def checkIfAccountExist(session, UID):
     if int(UID) < 1:
         raise ValueError(
             "Account ID shouldn't be less than 1")
+    # account = session.query(Account).filter(
+    #     Account.id == UID).with_for_update().first()
     account = session.query(Account).filter(
-        Account.id == UID).with_for_update().first()
+        Account.id == UID).first()
     if account is None:
         raise ValueError("Account doesn't exist")
-    return account
+    # return account
 
 
 def checkSymbolName(symbol):
@@ -41,7 +45,6 @@ def addAccount(session, ID, BALANCE):
 def addPosition(session, account_ID, sym, num):
     # If the account doesn't exist
     checkIfAccountExist(session, account_ID)
-
     if num < 0:
         raise ValueError("The position should be positive")
     # check if the symbol already exist
@@ -62,11 +65,13 @@ def addPosition(session, account_ID, sym, num):
 
 def addTranscation(session, uid, sym, amt, price):
     # If the account doesn't exist
-    account = checkIfAccountExist(session, uid)
+    checkIfAccountExist(session, uid)
 
     if amt > 0:
         # It is a buy order
         # We need to check the balance
+        account = session.query(Account).filter(
+            Account.id == uid).with_for_update().first()
         if account.balance < amt * price:
             raise ValueError(
                 "The remaining balance is not sufficient")
