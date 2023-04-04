@@ -1,8 +1,6 @@
 from sqlalchemy import update
 from dbTable import *
 from utils import *
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import FlushError
 
 
 def checkIfAccountExist(session, UID):

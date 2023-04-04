@@ -1,3 +1,11 @@
+engine setup
 Connected to ('localhost', 12345)
 Request sent
-Received data: <result><created id="1" /><created id="2" /><created sym="TESLA" id="1" /></result>
+Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><error sym="TESLA" id="1">(psycopg2.errors.SerializationFailure) could not serialize access due to concurrent update
+
+[SQL: SELECT position.uid AS position_uid, position.symbol AS position_symbol, position.amount AS position_amount 
+FROM position 
+WHERE position.uid = %(uid_1)s AND position.symbol = %(symbol_1)s 
+ LIMIT %(param_1)s FOR UPDATE]
+[parameters: {'uid_1': '1', 'symbol_1': 'TESLA', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)</error></result>
