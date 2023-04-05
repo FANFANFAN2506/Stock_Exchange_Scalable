@@ -38,6 +38,7 @@ def testMatch():
     time.sleep(1)
     addTranscation(7, 'X', -400, 120)
 
+
 def testMatch1():
     session = createEngine()
     testMatch()
@@ -190,7 +191,7 @@ def main():
     # testParse()
     # testAdd()
     # testParseMatch()
-    #testSocket()
+    # testSocket()
 
 
 if __name__ == '__main__':
