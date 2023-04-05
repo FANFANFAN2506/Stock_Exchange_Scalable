@@ -1,7 +1,6 @@
 from dbTable import *
 from utils import *
 from addTodb import addPosition
-from sqlalchemy.orm import sessionmaker
 
 
 def print_matching_order(match_order):

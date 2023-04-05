@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from queryDb import *
 from addTodb import *
+from match_price import *
 
 
 def create_symbol(child):
@@ -31,6 +32,7 @@ def order_Transcation(root, child, response):
     try:
         if int(child.attrib['limit']) <= 0:
             raise ValueError("Price should be positive")
+        # lock
         tid = addTranscation(int(root.attrib['id']),
                              child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
         print("addtransaction finished")
