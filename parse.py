@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 from queryDb import *
 from addTodb import *
-from match_price import *
 
 
 def create_symbol(session, child):
@@ -31,10 +30,10 @@ def order_Transcation(session, root, child, response):
     try:
         if int(child.attrib['limit']) <= 0:
             raise ValueError("Price should be positive")
-        addTranscation(session, int(root.attrib['id']),
+        addTranscation(int(root.attrib['id']),
                        child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
-        execute_order(session, int(root.attrib['id']), child.attrib['sym'], int(
-            child.attrib['amount']), float(child.attrib['limit']))
+        # execute_order(session, int(root.attrib['id']), child.attrib['sym'], int(
+        #     child.attrib['amount']), float(child.attrib['limit']))
         attributes['id'] = root.attrib['id']
         response.append(construct_node('opened', None, **attributes))
     except Exception as e:
