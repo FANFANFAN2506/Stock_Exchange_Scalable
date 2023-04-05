@@ -1,9 +1,11 @@
 from match_price import *
 from dbTable import *
 from utils import *
+import traceback
 
 
-def checkIfAccountExist(session, UID):
+def checkIfAccountExist(UID):
+    session = Session()
     # If the account doesn't exist
     if int(UID) < 1:
         raise ValueError(
@@ -14,6 +16,7 @@ def checkIfAccountExist(session, UID):
         Account.id == UID).first()
     if account is None:
         raise ValueError("Account doesn't exist")
+    session.close()
     # return account
 
 
@@ -46,38 +49,39 @@ def addAccount(ID, BALANCE):
         raise ValueError("Accounts exists")
 
 
-def addPosition(session, account_ID, sym, num):
-    session1 = Session()
+def addPosition(account_ID, sym, num):
+    session = Session()
     # If the account doesn't exist
-    checkIfAccountExist(session1, account_ID)
+    checkIfAccountExist(account_ID)
     if num < 0:
         raise ValueError("The position should be positive")
     # check if the symbol already exist
     try:
-        check_sym = session1.query(Position).filter(
+        check_sym = session.query(Position).filter(
             Position.uid == account_ID).filter(Position.symbol == sym).with_for_update().first()
         if check_sym is None:
             # The symbol doesn't exist, add a new one
             position = Position(uid=account_ID, symbol=sym, amount=num)
-            session1.add(position)
+            session.add(position)
         else:
             # Else update the amount
             # new_amount = check_sym.amount + num
             # session.execute(update(Position).where(
             #     Position.uid == account_ID).filter(Position.symbol == sym).values(amount=new_amount))
             check_sym.amount += num
-        session1.commit()
-        session1.close()
+        session.commit()
+        session.close()
     except:
-        print("rollback")
-        session1.rollback()
-        session1.close()
+        # traceback.print_exc()
+        # print("rollback")
+        session.rollback()
+        session.close()
 
 
 def addTranscation(uid, sym, amt, price):
     session = Session()
     # If the account doesn't exist
-    checkIfAccountExist(session, uid)
+    checkIfAccountExist(uid)
 
     if amt > 0:
         # It is a buy order
@@ -105,13 +109,14 @@ def addTranscation(uid, sym, amt, price):
     transaction = Transaction(uid=uid, symbol=sym, amount=amt, limit=price)
     session.add(transaction)
     session.commit()
+    construct_tid = transaction.tid
     status = Status(tid=transaction.tid, name='open',
                     shares=amt, price=price, time=getCurrentTime())
     session.add(status)
     session.commit()
-    execute_order(session, int(uid), sym, int(
-        amt), float(price))
     session.close()
+    # return transaction.tid
+    return construct_tid
 
 
 def addStatus(session, tid, name, shares, price, time):

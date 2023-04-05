@@ -21,7 +21,8 @@ def query_status(node, order):
                 'executed', None, **attributes))
 
 
-def query_transcation(session, UID, TID):
+def query_transcation(UID, TID):
+    session = Session()
     status_node = ET.Element("status")
     status_node.set('id', str(TID))
     order = session.query(Status).join(Transaction).join(Account).filter(

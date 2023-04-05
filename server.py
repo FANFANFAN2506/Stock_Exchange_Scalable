@@ -6,11 +6,12 @@ import os
 
 def handle_client_xml(client_socket):
     print(f"Run on {os.getpid()}, waiting for message")
-    length = client_socket.recv(1024).decode()
-    data = client_socket.recv(length)
-    received_request = data.decode()
+    # length = client_socket.recv(1024).decode()
+    # data = client_socket.recv(length)
+    # received_request = data.decode()
     # print(f"Received xml {received_request}")
-    received_request = received_request.split("\n")[1]
+    # received_request = received_request.split("\n")[1]
+    received_request = client_socket.recv(1024).decode()
     Session = sessionmaker(bind=engine)
     session = Session()
     response = parsing_XML(session, received_request)
@@ -28,7 +29,7 @@ def initializer():
 
 def serverLitsen():
     # create a TCP socket
-    pool = Pool(4, initializer=initializer)
+    pool = Pool(3, initializer=initializer)
     init_Engine()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
