@@ -44,7 +44,7 @@ def serverLitsen():
     # create a TCP socket
     # pool = Pool(3)
     # pool = Pool(3, initializer=initializer, initargs=(l,))
-    pool = Pool(3, initializer=initializer)
+    pool = Pool(2, initializer=initializer)
     init_Engine()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -54,8 +54,10 @@ def serverLitsen():
     server_address = ('localhost', 12345)
     print('Server is listening on {}:{}'.format(*server_address))
     server_socket.bind(server_address)
-    server_socket.listen(20)
+    server_socket.listen(100)
+    socket_list = list()
     while(1):
         client_socket, addr = server_socket.accept()
-        print(f"connected to {addr}")
-        pool.apply_async(func=handle_client_xml, args=(client_socket,))
+        socket_list.append(client_socket)
+        if len(socket_list) > 0:
+            pool.apply_async(func=handle_client_xml, args=(client_socket,))

@@ -40,7 +40,7 @@ def check_matching_order(uid, amount, symbol, limit):
     # if it is a buy order, matching order will be sell orders with limit lower than this buy order's limit
     elif amount > 0:
         match_order = match_order.filter(Transaction.symbol == symbol,
-                                         Transaction.limit < limit,
+                                         Transaction.limit <= limit,
                                          Transaction.amount < 0,
                                          Status.name == 'open').with_for_update()
         match_order = match_order.order_by(
@@ -48,7 +48,7 @@ def check_matching_order(uid, amount, symbol, limit):
     # if it is a sell order, matching order will be buy orders with limit higher than this sell order's limit
     else:
         match_order = match_order.filter(Transaction.symbol == symbol,
-                                         Transaction.limit > limit,
+                                         Transaction.limit >= limit,
                                          Transaction.amount > 0,
                                          Status.name == 'open').with_for_update()
         match_order = match_order.order_by(

@@ -25,6 +25,7 @@ def create_symbol(child):
 
 
 def order_Transcation(root, child, response):
+    print("order")
     attributes = {'sym': child.attrib['sym'], 'amount':
                   str(int(child.attrib['amount'])), 'limit': child.attrib['limit']}
     try:
@@ -32,8 +33,10 @@ def order_Transcation(root, child, response):
             raise ValueError("Price should be positive")
         tid = addTranscation(int(root.attrib['id']),
                              child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
+        print("addtransaction finished")
         execute_order(int(root.attrib['id']), child.attrib['sym'], int(
             child.attrib['amount']), float(child.attrib['limit']), tid)
+        print("order finished")
         # traceback.print_exc()
         attributes['id'] = str(tid)
         response.append(construct_node('opened', None, **attributes))
@@ -101,6 +104,7 @@ def handle_create(root, response):
 
 
 def handle_transcation(root, response):
+    print("transaction")
     try:
         checkIfAccountExist(int(root.attrib['id']))
         for child in root:
@@ -118,6 +122,7 @@ def handle_transcation(root, response):
 
 
 def parsing_XML(request):
+    print("parsing")
     root = ET.fromstring(request)
     response = ET.Element("result")
     # create tag

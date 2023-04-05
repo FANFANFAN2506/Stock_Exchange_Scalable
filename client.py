@@ -1,7 +1,6 @@
 import socket
-from parse import *
 import time
-from utils import createRequest
+from utils import createRequest, transactionRequest
 
 
 def client_send(request):
@@ -50,7 +49,7 @@ if __name__ == '__main__':
     client_send(transactionRequest(
         1, None, [1, 2], None))
     end_time = time.time()
-    print(f"finish time is {start_time- end_time}")
+    print(f"finish time is {end_time-start_time}")
     # xmlString2 = "<transactions id=\"2\"><order sym=\"X\" amount=\"-10\" limit=\"2\"/></transactions>"
     # client_send(xmlString2)
 

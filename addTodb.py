@@ -15,6 +15,7 @@ def checkIfAccountExist(UID):
     account = session.query(Account).filter(
         Account.id == UID).first()
     if account is None:
+        session.close()
         raise ValueError("Account doesn't exist")
     session.close()
     # return account
@@ -29,15 +30,18 @@ def addAccount(ID, BALANCE):
     session1 = Session()
     # Make sure ID is larger and equal than 1
     if ID < 1:
+        session1.close()
         raise ValueError(
             "Account ID shouldn't be less than 1")
 
     if BALANCE < 0:
+        session1.close()
         raise ValueError(
             "Account Balance shouldn't be negative")
     # Check if ID exist:
     account = session1.query(Account).filter(Account.id == ID).first()
     if account is not None:
+        session1.close()
         raise ValueError("Account ID exists")
     try:
         account = Account(id=ID, balance=BALANCE)
@@ -46,6 +50,7 @@ def addAccount(ID, BALANCE):
         session1.close()
     except:
         session1.flush()
+        session1.close()
         raise ValueError("Accounts exists")
 
 
@@ -54,6 +59,7 @@ def addPosition(account_ID, sym, num):
     # If the account doesn't exist
     checkIfAccountExist(account_ID)
     if num < 0:
+        session.close()
         raise ValueError("The position should be positive")
     # check if the symbol already exist
     try:
@@ -79,6 +85,7 @@ def addPosition(account_ID, sym, num):
 
 
 def addTranscation(uid, sym, amt, price):
+    print("transaction start")
     session = Session()
     # If the account doesn't exist
     checkIfAccountExist(uid)
@@ -86,26 +93,36 @@ def addTranscation(uid, sym, amt, price):
     if amt > 0:
         # It is a buy order
         # We need to check the balance
+        session.commit()
         account = session.query(Account).filter(
             Account.id == uid).with_for_update().first()
         if account.balance < amt * price:
+            session.commit()
+            session.close()
             raise ValueError(
                 "The remaining balance is not sufficient")
         account.balance -= amt * price
+        session.commit()
     else:
         # It is a sell order:
+        session.commit()
         if_position = session.query(Position).filter(
             Position.uid == uid).filter(Position.symbol == sym).with_for_update().first()
         if if_position is None:
             # The symbol doesn't exist
+            session.commit()
+            session.close()
             raise ValueError(
                 "The symbol doesn't exist")
         else:
             if if_position.amount < abs(amt):
                 # The remaining shares are not sufficient
+                session.commit()
+                session.close()
                 raise ValueError(
                     "The remaining shares are insufficient")
             if_position.amount += amt
+    print("about adding to transaction")
     transaction = Transaction(uid=uid, symbol=sym, amount=amt, limit=price)
     session.add(transaction)
     session.commit()
