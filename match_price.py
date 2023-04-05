@@ -30,7 +30,7 @@ def print_current_symbol_status(session):
 
 def check_matching_order(session, uid, amount, symbol, limit):
     match_order = session.query(Status).join(
-        Transaction).filter(Status.tid == Transaction.tid).with_for_update()
+        Transaction).filter(Status.tid == Transaction.tid)
     # print("before matching")
     # print_matching_order(match_order)
     if amount == 0:
@@ -41,7 +41,7 @@ def check_matching_order(session, uid, amount, symbol, limit):
         match_order = match_order.filter(Transaction.symbol == symbol,
                                          Transaction.limit < limit,
                                          Transaction.amount < 0,
-                                         Status.name == 'open')
+                                         Status.name == 'open').with_for_update()
         match_order = match_order.order_by(
             Transaction.limit, Status.time).all()
     # if it is a sell order, matching order will be buy orders with limit higher than this sell order's limit
@@ -49,7 +49,7 @@ def check_matching_order(session, uid, amount, symbol, limit):
         match_order = match_order.filter(Transaction.symbol == symbol,
                                          Transaction.limit > limit,
                                          Transaction.amount > 0,
-                                         Status.name == 'open')
+                                         Status.name == 'open').with_for_update()
         match_order = match_order.order_by(
             Transaction.limit.desc(), Status.time).all()
     # print("check match order")
@@ -115,15 +115,18 @@ def execute_match_order(session, match_order, current_order_sid):
             # print_current_symbol_status()
 
 
-def execute_order(session, uid, sym, amt, price):
-    current_transaction = session.query(Transaction).filter(Transaction.uid == uid,
-                                                            Transaction.symbol == sym,
-                                                            Transaction.amount == amt,
-                                                            Transaction.limit == price).first()
+def execute_order(session, uid, sym, amt, price, tid):
+    # 拿到新加进来的transaction
+    # current_transaction = session.query(Transaction).filter(Transaction.uid == uid,
+    #                                                         Transaction.symbol == sym,
+    #                                                         Transaction.amount == amt,
+    #                                                         Transaction.limit == price).first()
+    current_transaction = session.query(
+        Transaction).filter(Transaction.tid == tid).first()
     # TODO: each transaction should only have one status with name open?
     current_order = session.query(Status).filter(
         Status.tid == current_transaction.tid, Status.name == 'open').first()
-
+    # print(current_order.sid, current_order.tid, current_order.name)
     if current_order is None:
         raise ValueError(
             "Cannot find current status")

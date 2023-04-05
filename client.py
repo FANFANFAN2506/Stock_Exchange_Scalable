@@ -1,5 +1,6 @@
 import socket
 from parse import *
+import time
 
 
 def client_send(request):
@@ -49,13 +50,16 @@ if __name__ == '__main__':
     # client_send(xmlString6)
     # xmlString7 = "<transactions id=\"7\"><order sym=\"X\" amount=\"-400\" limit=\"124\"/></transactions>"
     # client_send(xmlString7)
-    xmlString = "<create><account id=\"1\" balance=\"10000\"/><symbol sym=\"X\"><account id=\"1\">1000</account></symbol></create>"
+    xmlString = "<create><account id=\"1\" balance=\"10000000\"/><account id=\"2\" balance=\"10000000\"/><symbol sym=\"X\"><account id=\"1\">100</account><account id=\"2\">100</account></symbol></create>"
     client_send(xmlString)
     # for i in range(1, 5):
-    xmlString1 = "<transactions id=\"1\"><order sym=\"X\" amount=\"10\" limit=\"10\"/></transactions>"
+    xmlString1 = "<transactions id=\"1\"><order sym=\"X\" amount=\"10\" limit=\"3\"/></transactions>"
     client_send(xmlString1)
-    xmlString2 = "<transactions id=\"1\"><order sym=\"X\" amount=\"-10\" limit=\"10\"/></transactions>"
-    client_send(xmlString2)
+    xmlString1 = "<transactions id=\"1\"><order sym=\"X\" amount=\"10\" limit=\"3\"/></transactions>"
+    client_send(xmlString1)
+    # xmlString2 = "<transactions id=\"2\"><order sym=\"X\" amount=\"-10\" limit=\"2\"/></transactions>"
+    # client_send(xmlString2)
+
 # # create a TCP socket
 # client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
