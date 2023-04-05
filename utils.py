@@ -4,7 +4,7 @@ from dbTable import *
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select, Table, MetaData
 from sqlalchemy import create_engine
-''' 
+'''
 @func: Drop all the tables
 '''
 
@@ -30,7 +30,7 @@ def createEngine():
     return session
 
 
-''' 
+'''
 @func: Get current time
 '''
 
@@ -55,6 +55,26 @@ def construct_node(Name, Msg, **attributes):
     for key, value in attributes.items():
         child_node.set(key, value)
     return child_node
+
+
+def createRequest(uid, balance, position):
+    uid = str(uid)
+    balance = str(uid)
+    root = ET.Element("create")
+    account_node = ET.Element("account")
+    account_node.set("id", uid)
+    account_node.set("balance", balance)
+    root.append(account_node)
+    for sym, num in position.items():
+        sym = str(sym)
+        num = str(num)
+        symbol_node = construct_node("symbol", None, **{"sym": sym, })
+        symbol_node.append(construct_node(
+            "account", num, **{"id": uid, }))
+        root.append(symbol_node)
+    request = str(len(ET.tostring(root))) + "\n" + \
+        str(ET.tostring(root).decode())
+    return request.encode("utf-8")
 
 
 '''
@@ -115,3 +135,7 @@ def printOrderStatus(engine):
     cancel_order = query.filter(status_table.c.name == 'canceled')
     printquery(session, cancel_order)
     session.close()
+
+
+if __name__ == "__main__":
+    print(createRequest(1, 2000, {"TELSA": 2000, "X": 1000}))

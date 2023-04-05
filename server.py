@@ -6,40 +6,44 @@ import os
 
 def handle_client_xml(client_socket):
     print(f"Run on {os.getpid()}, waiting for message")
-    length = 0
-    while(1):
-        received_data = client_socket.recv(1).decode()
-        if received_data == "\n":
-            break
-        elif int(received_data) < 0 or int(received_data) > 9:
+    try:
+        length = 0
+        while(1):
+            received_data = client_socket.recv(1).decode("utf-8")
+            if received_data == "\n":
+                break
+            elif int(received_data) < 0 or int(received_data) > 9:
+                raise ValueError(
+                    "Inappropriate input for xml length")
+            else:
+                length = length * 10 + int(received_data)
+        if length <= 0:
             raise ValueError(
-                "Inappropriate input for xml length")
-        else:
-            length = length * 10 + int(received_data)
-    if length <= 0:
-        raise ValueError(
-            "Length cannot be 0")
-    print(length)
-    data = client_socket.recv(length)
-    received_request = data.decode()
-    print(f"Received xml {received_request}")
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    response = parsing_XML(session, received_request)
-    session.close()
-    # send a response back to the client
-    client_socket.sendall(response.encode())
-    client_socket.close()
+                "Length cannot be 0")
+        data = client_socket.recv(length)
+        received_request = data.decode("utf-8")
+        print(f"Received xml {received_request}")
+        response = parsing_XML(received_request)
+        # send a response back to the client
+        client_socket.sendall(response.encode("utf-8"))
+        client_socket.close()
+    except Exception as e:
+        client_socket.sendall(str(e))
+        client_socket.close()
 
 
 def initializer():
     """ensure the parent proc's database connections are not touched
     in the new connection pool"""
     engine.dispose(close=False)
+    # global lock
+    # lock = l
 
 
 def serverLitsen():
     # create a TCP socket
+    # pool = Pool(3)
+    # pool = Pool(3, initializer=initializer, initargs=(l,))
     pool = Pool(3, initializer=initializer)
     init_Engine()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

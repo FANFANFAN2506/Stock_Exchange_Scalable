@@ -39,8 +39,8 @@ def testMatch():
     time.sleep(1)
     addTranscation(7, 'X', 400, 150)
     execute_order(7, 'X', -400, 124, 7)
-    #addTranscation(7, 'X', -500, 122)
-    #execute_order(session, 7, 'X', -500, 122, 8)
+    # addTranscation(7, 'X', -500, 122)
+    # execute_order(session, 7, 'X', -500, 122, 8)
     session.close()
 
 
@@ -184,12 +184,12 @@ def testSocket():
 
 def main():
     # Check if connected to the database
-    testMatch()
+    # testMatch()
     # testTrans()
     # testParse()
     # testAdd()
     # testParseMatch()
-    #testSocket()
+    testSocket()
 
 
 if __name__ == '__main__':

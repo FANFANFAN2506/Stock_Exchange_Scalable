@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 from queryDb import *
 from addTodb import *
-import traceback
 
 
 def create_symbol(child):
@@ -85,6 +84,7 @@ def cancel_Transcation(root, child, response):
 
 
 def handle_create(root, response):
+    print("create")
     for child in root:
         if child.tag == 'account':
             attributes = {'id': child.attrib['id']}
@@ -117,7 +117,8 @@ def handle_transcation(root, response):
             response.append(construct_node('error', str(e), **attributes))
 
 
-def parsing_XML(session, request):
+def parsing_XML(request):
+    print("parsing")
     root = ET.fromstring(request)
     response = ET.Element("result")
     # create tag
