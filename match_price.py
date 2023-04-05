@@ -53,8 +53,8 @@ def check_matching_order(uid, amount, symbol, limit):
                                          Status.name == 'open').with_for_update()
         match_order = match_order.order_by(
             Transaction.limit.desc(), Status.time).all()
-    print("check match order")
-    print_matching_order(match_order)
+    #print("check match order")
+    #print_matching_order(match_order)
     session.close()
     return match_order
 
@@ -65,8 +65,8 @@ def execute_match_order(match_order, current_order_sid):
         Status.sid == current_order_sid).with_for_update().first()
     current_transaction = session.query(Transaction).filter(Transaction.tid==current_order.tid).first()
     current_Account = session.query(Account).filter(Account.id == current_transaction.uid).with_for_update().first()
-    if current_order.shares > 0:
-        print("current balance ", current_Account.balance)
+    # if current_order.shares > 0:
+    #     print("current balance ", current_Account.balance)
     # print("In total matching order", len(match_order))
     for order in match_order:
         if abs(order.shares) == abs(current_order.shares):
@@ -79,9 +79,9 @@ def execute_match_order(match_order, current_order_sid):
             current_order.time = getCurrentTime()
             if(current_order.shares > 0):
                 current_Account.balance -= (match_order_status.price - current_transaction.limit) * abs(current_order.shares)
-                print("current balance ", current_Account.balance)
+                #print("current balance ", current_Account.balance)
             session.commit()
-            print_current_symbol_status(session)
+            #print_current_symbol_status(session)
             break
         elif abs(order.shares) > abs(current_order.shares):
             match_order_status = session.query(Status).filter(
@@ -98,9 +98,9 @@ def execute_match_order(match_order, current_order_sid):
             current_order.time = getCurrentTime()
             if(current_order.shares > 0):
                 current_Account.balance -= (match_order_status.price - current_transaction.limit) * abs(current_order.shares)
-                print("current balance ", current_Account.balance)
+                #print("current balance ", current_Account.balance)
             session.commit()
-            print_current_symbol_status(session)
+            #print_current_symbol_status(session)
             break
         else:
             match_order_status = session.query(Status).filter(
@@ -115,10 +115,10 @@ def execute_match_order(match_order, current_order_sid):
                                              time=getCurrentTime())
             if(current_order.shares > 0):
                 current_Account.balance -= (match_order_status.price - current_transaction.limit) * abs(match_order_status.shares)
-                print("current balance ", current_Account.balance)
+                #print("current balance ", current_Account.balance)
             session.add(current_executed_status)
             session.commit()
-            print_current_symbol_status(session)
+            #print_current_symbol_status(session)
     session.close()
 
 
