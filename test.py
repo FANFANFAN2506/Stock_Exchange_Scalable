@@ -11,7 +11,6 @@ import time
 
 
 def testMatch():
-    session = createEngine()
     addAccount(1, 10000000)
     addAccount(2, 10000000)
     addAccount(3, 10000000)
@@ -37,10 +36,12 @@ def testMatch():
     time.sleep(1)
     addTranscation(6, 'X', 400, 125)
     time.sleep(1)
-    addTranscation(7, 'X', 400, 150)
-    execute_order(7, 'X', -400, 124, 7)
-    # addTranscation(7, 'X', -500, 122)
-    # execute_order(session, 7, 'X', -500, 122, 8)
+    addTranscation(7, 'X', -400, 120)
+
+def testMatch1():
+    session = createEngine()
+    testMatch()
+    execute_order(7)
     session.close()
 
 
@@ -184,12 +185,12 @@ def testSocket():
 
 def main():
     # Check if connected to the database
-    # testMatch()
+    testMatch1()
     # testTrans()
     # testParse()
     # testAdd()
     # testParseMatch()
-    testSocket()
+    #testSocket()
 
 
 if __name__ == '__main__':

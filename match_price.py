@@ -1,5 +1,6 @@
 from dbTable import *
 from utils import *
+from addTodb import addPosition
 from sqlalchemy.orm import sessionmaker
 
 
@@ -26,6 +27,29 @@ def print_current_symbol_status(session):
         print(status.sid, status.tid, status.name,
               status.shares, status.price, status.time)
     # session.close()
+
+
+def print_Account(current_Account, match_Account):
+    print("Current account")
+    print("AccountID, balance")
+    print(current_Account.id, current_Account.balance)
+    print("Match account")
+    print("AccountID, balance")
+    print(match_Account.id, match_Account.balance)
+
+
+def print_Account_Positon(current_Account, current_Position, match_Account, match_Position):
+    print_Account(current_Account, match_Account)
+    print("Current Position")
+    if not current_Position is None:
+        print("PositionID, symbol, amount")
+        print(current_Position.uid, current_Position.symbol,
+              current_Position.amount)
+    print("Match position")
+    if not match_Position is None:
+        print("PositionID, symbol, amount")
+        print(match_Position.uid, match_Position.symbol, match_Position.amount)
+    print()
 
 
 def check_matching_order(uid, amount, symbol, limit):
@@ -67,10 +91,21 @@ def execute_match_order(match_order, current_order_sid):
         Transaction.tid == current_order.tid).first()
     current_Account = session.query(Account).filter(
         Account.id == current_transaction.uid).with_for_update().first()
+    current_position = session.query(Position).filter(Position.uid == current_Account.id,
+                                                      Position.symbol == current_transaction.symbol).with_for_update().first()
     # if current_order.shares > 0:
     #     print("current balance ", current_Account.balance)
     # print("In total matching order", len(match_order))
     for order in match_order:
+        match_transaction = session.query(Transaction).filter(
+            Transaction.tid == order.tid).first()
+        match_Account = session.query(Account).filter(
+            Account.id == match_transaction.uid).with_for_update().first()
+        match_position = session.query(Position).filter(Position.uid == match_Account.id,
+                                                        Position.symbol == match_transaction.symbol).with_for_update().first()
+        print("before execute")
+        print_Account_Positon(
+            current_Account, current_position, match_Account, match_position)
         if abs(order.shares) == abs(current_order.shares):
             match_order_status = session.query(Status).filter(
                 Status.sid == order.sid).with_for_update().first()
@@ -79,12 +114,32 @@ def execute_match_order(match_order, current_order_sid):
             current_order.name = 'executed'
             current_order.price = match_order_status.price
             current_order.time = getCurrentTime()
+
+            # modify position and refund for account balance for buyer
             if(current_order.shares > 0):
                 current_Account.balance -= (match_order_status.price -
                                             current_transaction.limit) * abs(current_order.shares)
-                # print("current balance ", current_Account.balance)
+                if current_position is None:
+                    addPosition(current_Account.id, current_transaction.symbol, abs(
+                        current_order.shares))
+                else:
+                    current_position.amount += abs(current_order.shares)
+            # modify account balance for seller
+            else:
+                current_Account.balance += match_order_status.price * \
+                    abs(current_order.shares)
+                if match_position is None:
+                    addPosition(match_Account.id, current_transaction.symbol, abs(
+                        current_order.shares))
+                else:
+                    match_position.amount += abs(current_order.shares)
+
+            # print("current balance ", current_Account.balance)
             session.commit()
-            # print_current_symbol_status(session)
+            print("after execute")
+            print_current_symbol_status(session)
+            print_Account_Positon(
+                current_Account, current_position, match_Account, match_position)
             break
         elif abs(order.shares) > abs(current_order.shares):
             match_order_status = session.query(Status).filter(
@@ -99,12 +154,31 @@ def execute_match_order(match_order, current_order_sid):
             current_order.name = 'executed'
             current_order.price = match_order_status.price
             current_order.time = getCurrentTime()
+            # modify position and refund for account balance for buyer
             if(current_order.shares > 0):
                 current_Account.balance -= (match_order_status.price -
                                             current_transaction.limit) * abs(current_order.shares)
+                if current_position is None:
+                    addPosition(current_Account.id, current_transaction.symbol, abs(
+                        current_order.shares))
+                else:
+                    current_position.amount += abs(current_order.shares)
+            # modify account balance for seller
+            else:
+                current_Account.balance += match_order_status.price * \
+                    abs(current_order.shares)
+                if match_position is None:
+                    addPosition(match_Account.id, current_transaction.symbol, abs(
+                        current_order.shares))
+                else:
+                    match_position.amount += abs(current_order.shares)
+
                 # print("current balance ", current_Account.balance)
             session.commit()
-            # print_current_symbol_status(session)
+            print("after execute")
+            print_Account_Positon(
+                current_Account, current_position, match_Account, match_position)
+            print_current_symbol_status(session)
             break
         else:
             match_order_status = session.query(Status).filter(
@@ -120,14 +194,31 @@ def execute_match_order(match_order, current_order_sid):
             if(current_order.shares > 0):
                 current_Account.balance -= (match_order_status.price -
                                             current_transaction.limit) * abs(match_order_status.shares)
+                if current_position is None:
+                    addPosition(current_Account.id, current_transaction.symbol, abs(
+                        match_order_status.shares))
+                else:
+                    current_position.amount += abs(current_order.shares)
+            # modify account balance for seller
+            else:
+                current_Account.balance += match_order_status.price * \
+                    abs(match_order_status.shares)
+                if match_position is None:
+                    addPosition(match_Account.id, current_transaction.symbol, abs(
+                        match_order_status.shares))
+                else:
+                    match_position.amount += abs(match_order_status.shares)
                 # print("current balance ", current_Account.balance)
             session.add(current_executed_status)
             session.commit()
-            # print_current_symbol_status(session)
+            print("after execute")
+            print_Account_Positon(
+                current_Account, current_position, match_Account, match_position)
+            print_current_symbol_status(session)
     session.close()
 
 
-def execute_order(uid, sym, amt, price, tid):
+def execute_order(tid):
     session = Session()
     current_transaction = session.query(
         Transaction).filter(Transaction.tid == tid).first()
