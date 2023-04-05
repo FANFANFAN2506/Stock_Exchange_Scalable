@@ -118,7 +118,6 @@ def handle_transcation(root, response):
 
 
 def parsing_XML(request):
-    print("parsing")
     root = ET.fromstring(request)
     response = ET.Element("result")
     # create tag

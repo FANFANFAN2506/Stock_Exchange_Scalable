@@ -57,9 +57,18 @@ def construct_node(Name, Msg, **attributes):
     return child_node
 
 
+''' 
+@func: Construct a <create> request for client
+@param: uid: user account id wants to create;
+        balance: The balance for this user
+        position: {symbol:num, symbol:num}The position to be added to the specified account 
+@return: <create> request encoded in utf-8
+'''
+
+
 def createRequest(uid, balance, position):
     uid = str(uid)
-    balance = str(uid)
+    balance = str(balance)
     root = ET.Element("create")
     account_node = ET.Element("account")
     account_node.set("id", uid)
@@ -72,6 +81,35 @@ def createRequest(uid, balance, position):
         symbol_node.append(construct_node(
             "account", num, **{"id": uid, }))
         root.append(symbol_node)
+    request = str(len(ET.tostring(root))) + "\n" + \
+        str(ET.tostring(root).decode())
+    return request.encode("utf-8")
+
+
+''' 
+@func: Construct a <transaction> request for client
+@param: uid: user account id to query;
+        order: a set of order tuples including sym, amt, limit [(s1,a1,l1),(s2, a2,l2)]
+        query: a set of query tuples, including the transaction id, [1,2,3,4]
+        cancle: a set of cancel tuples, including the transaction id, [1,2,3,4]
+@return: <transaction> request encoded in utf-8
+'''
+
+
+def transactionRequest(uid, order, query, cancel):
+    uid = str(uid)
+    root = ET.Element("transactions")
+    root.set("id", uid)
+    if order:
+        for sym, amt, limit in order:
+            root.append(construct_node("order", None, **
+                        {"sym": str(sym), "amount": str(amt), "limit": str(limit)}))
+    if query:
+        for tid in query:
+            root.append(construct_node("query", None, **{"id": str(tid), }))
+    if cancel:
+        for tid in cancel:
+            root.append(construct_node("cancel", None, **{"id": str(tid), }))
     request = str(len(ET.tostring(root))) + "\n" + \
         str(ET.tostring(root).decode())
     return request.encode("utf-8")
@@ -138,4 +176,7 @@ def printOrderStatus(engine):
 
 
 if __name__ == "__main__":
+    # def transactionRequest(uid, order, query, cancel):
     print(createRequest(1, 2000, {"TELSA": 2000, "X": 1000}))
+    # print(transactionRequest(
+    #     1, [("TELSA", 10, 10), ("X", -10, 5)], [1, 2], [1, 2]))

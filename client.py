@@ -42,6 +42,13 @@ if __name__ == '__main__':
     # xmlString2 = "<transactions id=\"1\"><order sym=\"X\" amount=\"-10\" limit=\"10\"/></transactions>"
     # client_send(constructRequestLength(xmlString2))
     client_send(createRequest(1, 2000, {"TELSA": 2000, "X": 1000}))
+    print()
+    client_send(transactionRequest(
+        1, [("TELSA", 10, 10), ("X", -10, 5)], [1, 2], None))
+    client_send(transactionRequest(
+        1, None, None, [1, 2]))
+    client_send(transactionRequest(
+        1, None, [1, 2], None))
     end_time = time.time()
     print(f"finish time is {start_time- end_time}")
     # xmlString2 = "<transactions id=\"2\"><order sym=\"X\" amount=\"-10\" limit=\"2\"/></transactions>"
