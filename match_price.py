@@ -60,6 +60,10 @@ def check_matching_order(session, uid, amount, symbol, limit):
 def execute_match_order(session, match_order, current_order_sid):
     current_order = session.query(Status).filter(
         Status.sid == current_order_sid).first()
+    current_transaction = session.query(Transaction).filter(Transaction.tid==current_order.tid).first()
+    current_Account = session.query(Account).filter(Account.id == current_transaction.uid).first()
+    if current_order.shares > 0:
+        print("current balance ", current_Account.balance)
     # print("In total matching order", len(match_order))
     for order in match_order:
         if abs(order.shares) == abs(current_order.shares):
@@ -70,6 +74,8 @@ def execute_match_order(session, match_order, current_order_sid):
             current_order.name = 'executed'
             current_order.price = match_order_status.price
             current_order.time = getCurrentTime()
+            if(current_order.shares > 0):
+                current_Account.balance -= (match_order_status.price - current_transaction.limit) * abs(current_order.shares)
             session.commit()
             # print_current_symbol_status()
             break
@@ -86,6 +92,8 @@ def execute_match_order(session, match_order, current_order_sid):
             current_order.name = 'executed'
             current_order.price = match_order_status.price
             current_order.time = getCurrentTime()
+            if(current_order.shares > 0):
+                current_Account.balance -= (match_order_status.price - current_transaction.limit) * abs(current_order.shares)
             session.commit()
             # print_current_symbol_status()
             break
@@ -100,6 +108,8 @@ def execute_match_order(session, match_order, current_order_sid):
                                              shares=(-match_order_status.shares),
                                              price=match_order_status.price,
                                              time=getCurrentTime())
+            if(current_order.shares > 0):
+                current_Account.balance -= (match_order_status.price - current_transaction.limit) * abs(match_order_status.shares)
             session.add(current_executed_status)
             session.commit()
             # print_current_symbol_status()

@@ -7,12 +7,3 @@ Received data: <result><error id="1">Account ID exists</error><error id="2">Acco
 Connected to ('localhost', 12345)
 Request sent
 Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><created sym="TESLA" id="1" /></result>
-Connected to ('localhost', 12345)
-Request sent
-Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><created sym="TESLA" id="1" /></result>
-Connected to ('localhost', 12345)
-Request sent
-Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><created sym="TESLA" id="1" /></result>
-Connected to ('localhost', 12345)
-Request sent
-Received data: <result><error id="1">Account ID exists</error><error id="2">Account ID exists</error><created sym="TESLA" id="1" /></result>

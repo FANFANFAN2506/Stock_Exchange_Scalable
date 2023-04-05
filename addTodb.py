@@ -46,7 +46,7 @@ def addAccount(ID, BALANCE):
         raise ValueError("Accounts exists")
 
 
-def addPosition(session, account_ID, sym, num):
+def addPosition(account_ID, sym, num):
     session1 = Session()
     # If the account doesn't exist
     checkIfAccountExist(session1, account_ID)
