@@ -33,10 +33,8 @@ def order_Transcation(root, child, response):
             raise ValueError("Price should be positive")
         tid = addTranscation(int(root.attrib['id']),
                              child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
-        session = Session()
-        execute_order(session, int(root.attrib['id']), child.attrib['sym'], int(
+        execute_order(int(root.attrib['id']), child.attrib['sym'], int(
             child.attrib['amount']), float(child.attrib['limit']), tid)
-        session.close()
         # traceback.print_exc()
         attributes['id'] = str(tid)
         response.append(construct_node('opened', None, **attributes))

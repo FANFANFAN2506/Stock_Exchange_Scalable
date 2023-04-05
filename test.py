@@ -37,10 +37,10 @@ def testMatch():
     time.sleep(1)
     addTranscation(6, 'X', 400, 125)
     time.sleep(1)
-    addTranscation(7, 'X', -400, 124)
-    execute_order(session, 7, 'X', -400, 124, 7)
-    addTranscation(7, 'X', -500, 122)
-    execute_order(session, 7, 'X', -500, 122, 8)
+    addTranscation(7, 'X', 400, 150)
+    execute_order(7, 'X', -400, 124, 7)
+    #addTranscation(7, 'X', -500, 122)
+    #execute_order(session, 7, 'X', -500, 122, 8)
     session.close()
 
 
