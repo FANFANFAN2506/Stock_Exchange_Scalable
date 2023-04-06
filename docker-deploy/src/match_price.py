@@ -218,7 +218,7 @@ def execute_match_order(match_order, current_order_sid):
     session.close()
 
 
-def execute_order(uid, sym, amt, price, tid):
+def execute_order(tid):#uid, sym, amt, price, 
     session = Session()
     current_transaction = session.query(
         Transaction).filter(Transaction.tid == tid).first()

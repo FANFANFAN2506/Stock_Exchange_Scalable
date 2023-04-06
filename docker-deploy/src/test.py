@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from parse import *
 from match_price import *
-from addTodb import addTranscation
+from addTodb import *
 from server import *
 import time
 
@@ -42,7 +42,7 @@ def testMatch():
 def testMatch1():
     session = createEngine()
     testMatch()
-    execute_order(7)
+    execute_order(7, 'X', -400, 120, 7)
     session.close()
 
 

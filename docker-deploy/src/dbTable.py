@@ -3,7 +3,9 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 engine = create_engine(
-    'postgresql://postgres:passw0rd@localhost:5432/hw4_568')
+        'postgresql://postgres:postgres@postgres_db_container:5432/postgres')
+# engine = create_engine(
+#         'postgresql://postgres:passw0rd@localhost:5432/hw4_568')
 Session = sessionmaker(bind=engine)
 
 

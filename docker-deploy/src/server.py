@@ -54,7 +54,7 @@ def serverLitsen():
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     # bind the socket to a specific address and port
-    server_address = ('localhost', 12345)
+    server_address = ('0.0.0.0', 12345)
     print('Server is listening on {}:{}'.format(*server_address))
     server_socket.bind(server_address)
     server_socket.listen(100)
@@ -65,3 +65,7 @@ def serverLitsen():
         if len(socket_list) > 0:
             current_client = socket_list.pop(0)
             pool.apply_async(func=handle_client_xml, args=(current_client,))
+
+if __name__ == '__main__':
+    serverLitsen()
+
