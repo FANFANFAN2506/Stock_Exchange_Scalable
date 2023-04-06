@@ -1,12 +1,7 @@
 from dbTable import *
 from utils import *
-<<<<<<< HEAD
-from sqlalchemy.orm import sessionmaker
-from addTodb import *
-=======
 from addTodb import addPosition
 
->>>>>>> ddfee1a59f3bca7b8c0b8f1a00a006a4751bb205
 
 def print_matching_order(match_order):
     print("StatusID, TID, name, shares, price, time")
@@ -101,6 +96,7 @@ def execute_match_order(match_order, current_order_sid):
     #     print("current balance ", current_Account.balance)
     # print("In total matching order", len(match_order))
     for order in match_order:
+        session.commit()
         match_transaction = session.query(Transaction).filter(
             Transaction.tid == order.tid).first()
         match_Account = session.query(Account).filter(
@@ -113,9 +109,9 @@ def execute_match_order(match_order, current_order_sid):
         if abs(order.shares) == abs(current_order.shares):
             match_order_status = session.query(Status).filter(
                 Status.sid == order.sid).with_for_update().first()
-            match_order_status.name = 'executed'
             match_order_status.time = getCurrentTime()
             current_order.name = 'executed'
+            match_order_status.name = 'executed'
             current_order.price = match_order_status.price
             current_order.time = getCurrentTime()
 
@@ -187,7 +183,6 @@ def execute_match_order(match_order, current_order_sid):
         else:
             match_order_status = session.query(Status).filter(
                 Status.sid == order.sid).with_for_update().first()
-            match_order_status.name = 'executed'
             match_order_status.time = getCurrentTime()
             current_order.shares += match_order_status.shares
             current_executed_status = Status(tid=current_order.tid,
@@ -195,6 +190,8 @@ def execute_match_order(match_order, current_order_sid):
                                              shares=(-match_order_status.shares),
                                              price=match_order_status.price,
                                              time=getCurrentTime())
+            session.add(current_executed_status)
+            match_order_status.name = 'executed'
             if(current_order.shares > 0):
                 current_Account.balance -= (match_order_status.price -
                                             current_transaction.limit) * abs(match_order_status.shares)
@@ -213,7 +210,6 @@ def execute_match_order(match_order, current_order_sid):
                 else:
                     match_position.amount += abs(match_order_status.shares)
                 # print("current balance ", current_Account.balance)
-            session.add(current_executed_status)
             session.commit()
             print("after execute")
             print_Account_Positon(
@@ -222,7 +218,7 @@ def execute_match_order(match_order, current_order_sid):
     session.close()
 
 
-def execute_order(tid):
+def execute_order(uid, sym, amt, price, tid):
     session = Session()
     current_transaction = session.query(
         Transaction).filter(Transaction.tid == tid).first()
@@ -240,6 +236,7 @@ def execute_order(tid):
             "Current order is not open")
     match_order = check_matching_order(
         current_transaction.uid, current_transaction.amount, current_transaction.symbol, current_transaction.limit)
+    session.commit()
     execute_match_order(match_order, current_order.sid)
     session.commit()
     session.close()
