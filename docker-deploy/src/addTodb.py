@@ -83,7 +83,7 @@ def addPosition(account_ID, sym, num):
 
 
 def addTranscation(uid, sym, amt, price):
-    print("transaction start")
+    # print("transaction start")
     session = Session()
     # If the account doesn't exist
     checkIfAccountExist(uid)
@@ -120,7 +120,7 @@ def addTranscation(uid, sym, amt, price):
                 raise ValueError(
                     "The remaining shares are insufficient")
             if_position.amount += amt
-    print("about adding to transaction")
+    # print("about adding to transaction")
     transaction = Transaction(uid=uid, symbol=sym, amount=amt, limit=price)
     session.add(transaction)
     session.commit()

@@ -55,44 +55,52 @@ def query_Transcation(root, child, response):
 
 
 def cancel_Transcation(root, child, response):
-    session = Session()
-    cancel_node = ET.Element("canceled")
-    cancel_node.set('id', str(child.attrib['id']))
-    all_status = session.query(Status).join(Transaction).join(Account).filter(
-        Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id'])
-    if all_status.count() == 0:
-        Msg = "Transcation id doesn't exist"
-        attributes = {'id': str(child.attrib['id'])}
-        response.append(construct_node('error', Msg, **attributes))
-        return
-    open_status = all_status.filter(
-        Status.name == 'open').with_for_update().first()
-    open_status.name = 'canceled'
-    open_status.time = getCurrentTime()
-    session.commit()
-    executing_symbol = session.query(Transaction).filter(
-        Transaction.tid == child.attrib['id']).first().symbol
-    user = session.query(Account).filter(Account.id == int(
-        root.attrib['id'])).with_for_update().first()
-    if open_status.shares > 0:
-        # THis is a buy order refund balance
-        user.balance += open_status.shares * open_status.price
+    global l
+    with l:
+        session = Session()
+        cancel_node = ET.Element("canceled")
+        cancel_node.set('id', str(child.attrib['id']))
+        all_status = session.query(Status).join(Transaction).join(Account).filter(
+            Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id'])
+        if all_status.count() == 0:
+            Msg = "Transcation id doesn't exist"
+            attributes = {'id': str(child.attrib['id'])}
+            response.append(construct_node('error', Msg, **attributes))
+            session.close()
+            return
+        open_status = all_status.filter(
+            Status.name == 'open').with_for_update().first()
+        if open_status is None:
+            session.commit()
+            session.close()
+            raise ValueError("This Transaction is not open")
+        open_status.name = 'canceled'
+        open_status.time = getCurrentTime()
         session.commit()
-    else:
-        session.commit()
-        # THis is a sell order refund shares
-        user_position = session.query(Position).filter(Position.uid == user.id).filter(
-            Position.symbol == executing_symbol).with_for_update().first()
-        user_position.amount += abs(open_status.shares)
-    session.commit()
-    order = session.query(Status).join(Transaction).join(Account).filter(
-        Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id']).order_by(Status.sid.asc())
-    query_status(cancel_node, order)
-    response.append(cancel_node)
+        executing_symbol = session.query(Transaction).filter(
+            Transaction.tid == child.attrib['id']).first().symbol
+        user = session.query(Account).filter(Account.id == int(
+            root.attrib['id'])).with_for_update().first()
+        if open_status.shares > 0:
+            # THis is a buy order refund balance
+            user.balance += open_status.shares * open_status.price
+            session.commit()
+        else:
+            session.commit()
+            # THis is a sell order refund shares
+            user_position = session.query(Position).filter(Position.uid == user.id).filter(
+                Position.symbol == executing_symbol).with_for_update().first()
+            user_position.amount += abs(open_status.shares)
+            session.commit()
+        order = session.query(Status).join(Transaction).join(Account).filter(
+            Account.id == int(root.attrib['id'])).filter(Transaction.tid == child.attrib['id']).order_by(Status.sid.asc())
+        query_status(cancel_node, order)
+        response.append(cancel_node)
+        session.close()
 
 
 def handle_create(root, response):
-    print("create")
+    # print("create")
     for child in root:
         if child.tag == 'account':
             attributes = {'id': child.attrib['id']}
@@ -135,5 +143,5 @@ def parsing_XML(request):
         handle_create(root, response)
     else:
         handle_transcation(root, response)
-    print(ET.tostring(response).decode())
+    # print(ET.tostring(response).decode())
     return ET.tostring(response).decode()
