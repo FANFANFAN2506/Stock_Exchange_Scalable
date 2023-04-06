@@ -24,7 +24,7 @@ def create_symbol(child):
     except Exception as e:
         attributes = {'sym': child.attrib['sym']}
         return_node.append(construct_node('error', str(e), **attributes))
-    return list(return_node)#return_node.getchildren()
+    return list(return_node)  # return_node.getchildren()
 
 
 def order_Transcation(root, child, response):

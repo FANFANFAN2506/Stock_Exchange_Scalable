@@ -2,8 +2,7 @@ import socket
 from parse import *
 from dbTable import engine
 from multiprocessing import Pool
-import os
-import traceback
+PROCESS_NUM = 3
 
 
 def handle_client_xml(client_socket):
@@ -30,7 +29,7 @@ def handle_client_xml(client_socket):
         client_socket.sendall(response.encode("utf-8"))
         client_socket.close()
     except Exception as e:
-        traceback.print_exc()
+        # traceback.print_exc()
         client_socket.sendall(str(e))
         client_socket.close()
 
@@ -46,7 +45,7 @@ def initializer(l):
 def serverLitsen():
     # create a TCP socket
     # pool = Pool(3)
-    pool = Pool(3, initializer=initializer, initargs=(l,))
+    pool = Pool(PROCESS_NUM, initializer=initializer, initargs=(l,))
     # pool = Pool(2, initializer=initializer)
     init_Engine()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -66,6 +65,6 @@ def serverLitsen():
             current_client = socket_list.pop(0)
             pool.apply_async(func=handle_client_xml, args=(current_client,))
 
+
 if __name__ == '__main__':
     serverLitsen()
-

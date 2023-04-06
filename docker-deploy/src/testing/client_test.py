@@ -4,10 +4,10 @@ import socket
 import time
 import threading
 SERVER_ADDR = 'localhost'
-USER_NUM = 100
-set_concurrent = True
-set_serialize = False
-
+USER_NUM = 10
+set_concurrent = False
+set_serialize = True
+set_print = False
 
 '''
 This file is for scalability testing, including the serialize test and concurrent test
@@ -110,10 +110,12 @@ def client_send(request):
     server_address = (SERVER_ADDR, 12345)
     client_socket.connect(server_address)
     client_socket.sendall(request)
-    print(f"Request send {request}")
+    if set_print:
+        print(f"Request send {request}")
     # receive data from server
     response = client_socket.recv(1024)
-    print('Received data:', response)
+    if set_print:
+        print('Received data:', response)
     # print()
     # close the connection
     client_socket.close()
