@@ -3,27 +3,18 @@ import xml.etree.ElementTree as ET
 from dbTable import *
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select, Table, MetaData
-from sqlalchemy import create_engine
 '''
 @func: Drop all the tables
 '''
 
 
 def init_Engine():
-    # engine = create_engine(
-    #     'postgresql://postgres:passw0rd@localhost:5432/hw4_568')
-    # engine = create_engine(
-    #     'postgresql://postgres:postgres@postgres_db_container:5432/postgres')
-    # print('Opened database successfully')
     Base.metadata.drop_all(engine)
     print('Drop tables successfully')
     Base.metadata.create_all(engine)
 
 
 def createEngine():
-    engine = create_engine(
-        'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
-    print('Opened database successfully')
     Base.metadata.drop_all(engine)
     print('Drop tables successfully')
     Base.metadata.create_all(engine)

@@ -12,7 +12,7 @@ For server test please go to testing directory to run the client_test.py there.
 '''
 
 
-''' 
+'''
 @func: This is the unit test and combination test for order matching and adding to database function
 '''
 
@@ -54,8 +54,6 @@ def testMatch1():
 
 
 def testParseMatch():
-    # engine = create_engine(
-    #     'postgresql://postgres:passw0rd@localhost:5432/hw4_568', isolation_level='SERIALIZABLE')
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
@@ -70,26 +68,27 @@ def testParseMatch():
     xmlString5 = "<transactions id=\"5\"><order sym=\"X\" amount=\"-200\" limit=\"140\"/></transactions>"
     xmlString6 = "<transactions id=\"6\"><order sym=\"X\" amount=\"400\" limit=\"125\"/></transactions>"
     xmlString7 = "<transactions id=\"7\"><order sym=\"X\" amount=\"-400\" limit=\"124\"/></transactions>"
+
+    print(parsing_XML(xmlString))
+    print(parsing_XML(xmlString1))
+    print(parsing_XML(xmlString2))
+    print(parsing_XML(xmlString3))
+    print(parsing_XML(xmlString4))
+    print(parsing_XML(xmlString5))
+    print(parsing_XML(xmlString6))
     print("Before matching:")
-    parsing_XML(xmlString)
-    parsing_XML(xmlString1)
-    parsing_XML(xmlString2)
-    parsing_XML(xmlString3)
-    parsing_XML(xmlString4)
-    parsing_XML(xmlString5)
-    parsing_XML(xmlString6)
     printAccountPosition(engine)
     printOrderStatus(engine)
     print("New order:")
     print(xmlString7)
-    parsing_XML(xmlString7)
+    print(parsing_XML(xmlString7))
     print("After matching:")
     printAccountPosition(engine)
     printOrderStatus(engine)
     session.close()
 
 
-''' 
+'''
 @func: This is the unit test and combination test for XML parser and adding to databse functions
 '''
 
@@ -101,7 +100,7 @@ def testParse():
     print("Request:")
     print(xmlString)
     print("Response:")
-    parsing_XML(xmlString)
+    print(parsing_XML(xmlString))
     print("")
     print("----Test 2 Failed: Query number and cancel number does not exist----")
     xmlString2 = "<create><account id=\"1\" balance=\"50000\"/><symbol sym=\"TESLA\"><account id=\"1\">500</account></symbol></create>"
@@ -110,8 +109,8 @@ def testParse():
     print(xmlString2)
     print(xmlString3)
     print("Response:")
-    parsing_XML(xmlString2)
-    parsing_XML(xmlString3)
+    print(parsing_XML(xmlString2))
+    print(parsing_XML(xmlString3))
     print("")
     print("----Test 3 Failed: Trasaciton account id doesn't exsit, transcation doesn't belong to account----")
     xmlString8 = "<transactions id=\"1000\"><order sym=\"TESLA\" amount=\"100\" limit=\"250\"/><query id=\"1\"/><cancel id=\"1\"/></transactions>"
@@ -120,8 +119,8 @@ def testParse():
     print(xmlString8)
     print(xmlString7)
     print("Response:")
-    parsing_XML(xmlString8)
-    parsing_XML(xmlString7)
+    print(parsing_XML(xmlString8))
+    print(parsing_XML(xmlString7))
     print("")
     print("----Test 4 Success: Open a order, query it, then delete it and query again----")
     xmlString4 = "<create><account id=\"2\" balance=\"50000\"/><symbol sym=\"TB\"><account id=\"2\">500</account></symbol></create>"
@@ -134,17 +133,17 @@ def testParse():
     # print(xmlString6)
     print(xmlString9)
     print("Response:")
-    parsing_XML(xmlString4)
-    parsing_XML(xmlString5)
+    print(parsing_XML(xmlString4))
+    print(parsing_XML(xmlString5))
     time.sleep(1)
     # addStatus(  1, 'executed', 50, 250, getCurrentTime())
-    # parsing_XML(  xmlString6)
+    # print(parsing_XML(  xmlString6)
     time.sleep(1)
-    parsing_XML(xmlString9)
+    print(parsing_XML(xmlString9))
     session.close()
 
 
-''' 
+'''
 @func: This is the unit test for adding to database function
 '''
 
@@ -181,7 +180,7 @@ def testAdd():
     try:
         addPosition(1, 'S&P', 300)
         addPosition(1, 'BTC', 100)
-        addStatus(1, 'executed', 100, 100, getCurrentTime())
+        addStatus(session, 1, 'executed', 100, 100, getCurrentTime())
     except Exception as e:
         print(e)
     session.close()
@@ -198,10 +197,10 @@ def testCancel():
     print(xmlString6)
     print(xmlString9)
     print("Response:")
-    parsing_XML(xmlString4)
-    parsing_XML(xmlString5)
-    parsing_XML(xmlString6)
-    parsing_XML(xmlString9)
+    print(parsing_XML(xmlString4))
+    print(parsing_XML(xmlString5))
+    print(parsing_XML(xmlString6))
+    print(parsing_XML(xmlString9))
 
 
 def testSocket():
@@ -209,12 +208,15 @@ def testSocket():
 
 
 def main():
+    '''
+    Some of the tests cannot be run together, such as testParse()+testAdd()
+    Please try them seperately appreciate!
+    '''
     # testMatch1()
     # testTrans()
-    # testParse()
-    # testAdd()
     testParseMatch()
-    # testSocket()
+    testParse()
+    # testAdd()
     # testCancel()
 
 
