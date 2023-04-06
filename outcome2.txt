@@ -1,3 +1,0 @@
-Connected to ('localhost', 12345)
-Request sent
-Received data: b''

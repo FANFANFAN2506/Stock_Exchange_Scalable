@@ -1,9 +1,0 @@
-Connected to ('localhost', 12345)
-Request sent
-Received data: <result><created id="1" /><created id="2" /><created sym="X" id="1" /><created sym="X" id="2" /></result>
-Connected to ('localhost', 12345)
-Request sent
-Received data: <result><opened sym="X" amount="10" limit="3" id="1" /></result>
-Connected to ('localhost', 12345)
-Request sent
-Received data: <result><opened sym="X" amount="-10" limit="2" id="2" /></result>
