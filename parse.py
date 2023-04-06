@@ -2,6 +2,8 @@ import xml.etree.ElementTree as ET
 from queryDb import *
 from addTodb import *
 from match_price import *
+import multiprocessing
+l = multiprocessing.Lock()
 
 
 def create_symbol(child):
@@ -26,19 +28,20 @@ def create_symbol(child):
 
 
 def order_Transcation(root, child, response):
-    print("order")
+    # print("order")
     attributes = {'sym': child.attrib['sym'], 'amount':
                   str(int(child.attrib['amount'])), 'limit': child.attrib['limit']}
     try:
         if int(child.attrib['limit']) <= 0:
             raise ValueError("Price should be positive")
         # lock
-        tid = addTranscation(int(root.attrib['id']),
-                             child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
-        print("addtransaction finished")
-        execute_order(int(root.attrib['id']), child.attrib['sym'], int(
-            child.attrib['amount']), float(child.attrib['limit']), tid)
-        print("order finished")
+        global l
+        with l:
+            tid = addTranscation(int(root.attrib['id']),
+                                 child.attrib['sym'], int(child.attrib['amount']), float(child.attrib['limit']))
+            # print("addtransaction finished")
+            execute_order(tid)
+        # print("order finished")
         # traceback.print_exc()
         attributes['id'] = str(tid)
         response.append(construct_node('opened', None, **attributes))
@@ -106,7 +109,7 @@ def handle_create(root, response):
 
 
 def handle_transcation(root, response):
-    print("transaction")
+    # print("transaction")
     try:
         checkIfAccountExist(int(root.attrib['id']))
         for child in root:
@@ -124,7 +127,7 @@ def handle_transcation(root, response):
 
 
 def parsing_XML(request):
-    print("parsing")
+    # print("parsing")
     root = ET.fromstring(request)
     response = ET.Element("result")
     # create tag

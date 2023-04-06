@@ -21,11 +21,11 @@ def construct_node(Name, Msg, **attributes):
     return child_node
 
 
-''' 
+'''
 @func: Construct a <create> request for client
 @param: uid: user account id wants to create;
         balance: The balance for this user
-        position: {symbol:num, symbol:num}The position to be added to the specified account 
+        position: {symbol:num, symbol:num}The position to be added to the specified account
 @return: <create> request encoded in utf-8
 '''
 
@@ -50,7 +50,7 @@ def createRequest(uid, balance, position):
     return request.encode("utf-8")
 
 
-''' 
+'''
 @func: Construct a <transaction> request for client
 @param: uid: user account id to query;
         order: a set of order tuples including sym, amt, limit [(s1,a1,l1),(s2, a2,l2)]
@@ -79,7 +79,15 @@ def transactionRequest(uid, order, query, cancel):
     return request.encode("utf-8")
 
 
-''' 
+def ParseTid(response):
+    root = ET.fromstring(response)
+    for child in root:
+        if child.tag == 'opened':
+            return child.attrib['id']
+    return None
+
+
+'''
 @func: client connect to the server and send the request
 @param: encoded request
 '''
@@ -99,24 +107,65 @@ def client_send(request):
     # print()
     # close the connection
     client_socket.close()
+    return response.decode("utf-8")
 
 
 def TestCreation(id):
     if id % 2 == 1:
+        tid_list = list()
         # If the user is odd, construct buy orders
-        client_send(createRequest(id, 20000, {"TELSA": 0, }))
-        # client_send(transactionRequest(id, [("TELSA", 20, 100)], [], []))
-        client_send(transactionRequest(id, [("TELSA", 100, 100)], [], []))
+        print(client_send(createRequest(id, 10000, {"TELSA": 0, "X": 100})))
+        response = client_send(transactionRequest(
+            id, [("X", -100, 100)], [], []))
+        print(response)
+        cancel_id = ParseTid(response)
+        response = client_send(transactionRequest(
+            id, [("TELSA", 50, 100)], [], []))
+        print(response)
+        tid_list.append(ParseTid(response))
+        response = client_send(transactionRequest(
+            id, [("TELSA", 50, 100)], [], []))
+        print(response)
+        tid_list.append(ParseTid(response))
+        print(client_send(transactionRequest(
+            id, [], [cancel_id, tid_list.pop(0), tid_list.pop(0)], [cancel_id, ])))
     else:
         # If the user is even number construct sell order
-        client_send(createRequest(id, 0, {"TELSA": 100, }))
-        client_send(transactionRequest(id, [("TELSA", -100, 100)], [], []))
+        print(client_send(createRequest(id, 0, {"TELSA": 100, })))
+        response = client_send(transactionRequest(
+            id, [("TELSA", -100, 100)], [], []))
+        print(response)
+        tid = ParseTid(response)
+        print(client_send(transactionRequest(
+            id, [], [tid, ], [])))
+
+
+def TestQuery(id):
+    tid_list = list()
+    print(client_send(createRequest(id, 10000, {"X": 100, "Y": 100})))
+    response = client_send(transactionRequest(
+        id, [("X", 100, 100)], [], []))
+    print(response)
+    tid_list.append(ParseTid(response))
+    response = client_send(transactionRequest(
+        id, [("Y", -100, 100)], [], []))
+    print(response)
+    tid_list.append(ParseTid(response))
+    print(client_send(transactionRequest(
+        id, [], [tid_list[0], tid_list[1]], [tid_list[0], tid_list[1]])))
+    print(client_send(transactionRequest(
+        id, [], [tid_list[0], tid_list[1]], [])))
+
+
+def serializeTest(number):
+    for i in range(1, number + 1):
+        TestCreation(i)
 
 
 def concurrentTest(number):
     thread_list = list()
     for i in range(1, number+1):
-        t = threading.Thread(target=TestCreation, args=(i,))
+        t = threading.Thread(target=TestCreation, args=(i, number))
         t.start()
         thread_list.append(t)
 
@@ -126,6 +175,10 @@ def concurrentTest(number):
 
 if __name__ == "__main__":
     start_time = time.time()
-    concurrentTest(10)
+    serializeTest(4)
     end_time = time.time()
+    # start_time = time.time()
+    # concurrentTest(100)
+    # end_time = time.time()
+
     print(f"Running time is {end_time - start_time}")
