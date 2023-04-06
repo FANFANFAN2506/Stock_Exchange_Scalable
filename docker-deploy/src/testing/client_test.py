@@ -3,6 +3,16 @@ import xml.etree.ElementTree as ET
 import socket
 import time
 import threading
+SERVER_ADDR = 'localhost'
+USER_NUM = 100
+set_concurrent = True
+set_serialize = False
+
+
+'''
+This file is for scalability testing, including the serialize test and concurrent test
+Please feel free to adjust the server address, user number, concurrent or serialize above
+'''
 
 
 '''
@@ -97,13 +107,13 @@ def client_send(request):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     # connect the socket to a specific address and port
-    server_address = ('localhost', 12345)
+    server_address = (SERVER_ADDR, 12345)
     client_socket.connect(server_address)
     client_socket.sendall(request)
-    # print(f"Request send {request}")
+    print(f"Request send {request}")
     # receive data from server
     response = client_socket.recv(1024)
-    # print('Received data:', response)
+    print('Received data:', response)
     # print()
     # close the connection
     client_socket.close()
@@ -183,8 +193,10 @@ def concurrentTest(number):
 
 if __name__ == "__main__":
     start_time = time.time()
-    # serializeTest(100)
-    concurrentTest(100)
+    if set_serialize:
+        serializeTest(USER_NUM)
+    if set_concurrent:
+        concurrentTest(USER_NUM)
     end_time = time.time()
 
     print(f"Running time is {end_time - start_time}")
