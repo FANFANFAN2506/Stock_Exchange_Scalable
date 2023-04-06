@@ -1,7 +1,9 @@
 import socket
 from parse import *
+from dbTable import engine
 from multiprocessing import Pool
 import os
+import traceback
 
 
 def handle_client_xml(client_socket):
@@ -28,23 +30,24 @@ def handle_client_xml(client_socket):
         client_socket.sendall(response.encode("utf-8"))
         client_socket.close()
     except Exception as e:
+        traceback.print_exc()
         client_socket.sendall(str(e))
         client_socket.close()
 
 
-def initializer():
+def initializer(l):
     """ensure the parent proc's database connections are not touched
     in the new connection pool"""
     engine.dispose(close=False)
-    # global lock
-    # lock = l
+    global lock
+    lock = l
 
 
 def serverLitsen():
     # create a TCP socket
     # pool = Pool(3)
-    # pool = Pool(3, initializer=initializer, initargs=(l,))
-    pool = Pool(2, initializer=initializer)
+    pool = Pool(3, initializer=initializer, initargs=(l,))
+    # pool = Pool(2, initializer=initializer)
     init_Engine()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -60,4 +63,5 @@ def serverLitsen():
         client_socket, addr = server_socket.accept()
         socket_list.append(client_socket)
         if len(socket_list) > 0:
-            pool.apply_async(func=handle_client_xml, args=(client_socket,))
+            current_client = socket_list.pop(0)
+            pool.apply_async(func=handle_client_xml, args=(current_client,))

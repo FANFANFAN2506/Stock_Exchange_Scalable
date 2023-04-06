@@ -2,7 +2,6 @@ from sqlalchemy import Integer, Float, Column, String, ForeignKey, TEXT, TIMESTA
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import QueuePool
 engine = create_engine(
     'postgresql://postgres:passw0rd@localhost:5432/hw4_568')
 Session = sessionmaker(bind=engine)

@@ -103,9 +103,9 @@ def execute_match_order(match_order, current_order_sid):
             Account.id == match_transaction.uid).with_for_update().first()
         match_position = session.query(Position).filter(Position.uid == match_Account.id,
                                                         Position.symbol == match_transaction.symbol).with_for_update().first()
-        print("before execute")
-        print_Account_Positon(
-            current_Account, current_position, match_Account, match_position)
+        # print("before execute")
+        # print_Account_Positon(
+        #     current_Account, current_position, match_Account, match_position)
         if abs(order.shares) == abs(current_order.shares):
             match_order_status = session.query(Status).filter(
                 Status.sid == order.sid).with_for_update().first()
@@ -136,10 +136,10 @@ def execute_match_order(match_order, current_order_sid):
 
             # print("current balance ", current_Account.balance)
             session.commit()
-            print("after execute")
-            print_current_symbol_status(session)
-            print_Account_Positon(
-                current_Account, current_position, match_Account, match_position)
+            # print("after execute")
+            # print_current_symbol_status(session)
+            # print_Account_Positon(
+            #     current_Account, current_position, match_Account, match_position)
             break
         elif abs(order.shares) > abs(current_order.shares):
             match_order_status = session.query(Status).filter(
@@ -175,10 +175,10 @@ def execute_match_order(match_order, current_order_sid):
 
                 # print("current balance ", current_Account.balance)
             session.commit()
-            print("after execute")
-            print_Account_Positon(
-                current_Account, current_position, match_Account, match_position)
-            print_current_symbol_status(session)
+            # print("after execute")
+            # print_Account_Positon(
+            #     current_Account, current_position, match_Account, match_position)
+            # print_current_symbol_status(session)
             break
         else:
             match_order_status = session.query(Status).filter(
@@ -211,10 +211,10 @@ def execute_match_order(match_order, current_order_sid):
                     match_position.amount += abs(match_order_status.shares)
                 # print("current balance ", current_Account.balance)
             session.commit()
-            print("after execute")
-            print_Account_Positon(
-                current_Account, current_position, match_Account, match_position)
-            print_current_symbol_status(session)
+            # print("after execute")
+            # print_Account_Positon(
+            #     current_Account, current_position, match_Account, match_position)
+            # print_current_symbol_status(session)
     session.close()
 
 

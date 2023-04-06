@@ -185,13 +185,12 @@ def testSocket():
 
 
 def main():
-    # Check if connected to the database
-    testMatch1()
+    # testMatch1()
     # testTrans()
     # testParse()
     # testAdd()
     # testParseMatch()
-    # testSocket()
+    testSocket()
 
 
 if __name__ == '__main__':
