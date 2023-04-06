@@ -100,7 +100,7 @@ def cancel_Transcation(root, child, response):
 
 
 def handle_create(root, response):
-    print("create")
+    # print("create")
     for child in root:
         if child.tag == 'account':
             attributes = {'id': child.attrib['id']}
@@ -143,5 +143,5 @@ def parsing_XML(request):
         handle_create(root, response)
     else:
         handle_transcation(root, response)
-    print(ET.tostring(response).decode())
+    # print(ET.tostring(response).decode())
     return ET.tostring(response).decode()

@@ -7,7 +7,7 @@ import traceback
 
 
 def handle_client_xml(client_socket):
-    print(f"Run on {os.getpid()}, waiting for message")
+    # print(f"Run on {os.getpid()}, waiting for message")
     try:
         length = 0
         while(1):
@@ -24,7 +24,7 @@ def handle_client_xml(client_socket):
                 "Length cannot be 0")
         data = client_socket.recv(length)
         received_request = data.decode("utf-8")
-        print(f"Received xml {received_request}")
+        # print(f"Received xml {received_request}")
         response = parsing_XML(received_request)
         # send a response back to the client
         client_socket.sendall(response.encode("utf-8"))

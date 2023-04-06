@@ -114,47 +114,54 @@ def TestCreation(id):
     if id % 2 == 1:
         tid_list = list()
         # If the user is odd, construct buy orders
-        print(client_send(createRequest(id, 10000, {"TELSA": 0, "X": 100})))
+        client_send(createRequest(id, 10000, {"TELSA": 0, "X": 100}))
+        # print()
         response = client_send(transactionRequest(
             id, [("X", -100, 100)], [], []))
-        print(response)
+        # print(response)
         cancel_id = ParseTid(response)
         response = client_send(transactionRequest(
             id, [("TELSA", 50, 100)], [], []))
-        print(response)
+        # print(response)
         tid_list.append(ParseTid(response))
         response = client_send(transactionRequest(
             id, [("TELSA", 50, 100)], [], []))
-        print(response)
+        # print(response)
         tid_list.append(ParseTid(response))
-        print(client_send(transactionRequest(
-            id, [], [cancel_id, tid_list.pop(0), tid_list.pop(0)], [cancel_id, ])))
+        client_send(transactionRequest(
+            id, [], [cancel_id, tid_list.pop(0), tid_list.pop(0)], [cancel_id, ]))
+        # print()
     else:
         # If the user is even number construct sell order
-        print(client_send(createRequest(id, 0, {"TELSA": 100, })))
+        client_send(createRequest(id, 0, {"TELSA": 100, }))
+        # print()
         response = client_send(transactionRequest(
             id, [("TELSA", -100, 100)], [], []))
-        print(response)
+        # print(response)
         tid = ParseTid(response)
-        print(client_send(transactionRequest(
-            id, [], [tid, ], [])))
+        client_send(transactionRequest(
+            id, [], [tid, ], []))
+        # print()
 
 
 def TestQuery(id):
     tid_list = list()
-    print(client_send(createRequest(id, 10000, {"X": 100, "Y": 100})))
+    client_send(createRequest(id, 10000, {"X": 100, "Y": 100}))
     response = client_send(transactionRequest(
         id, [("X", 100, 100)], [], []))
-    print(response)
+    # print()
+    # print(response)
     tid_list.append(ParseTid(response))
     response = client_send(transactionRequest(
         id, [("Y", -100, 100)], [], []))
-    print(response)
+    # print(response)
     tid_list.append(ParseTid(response))
-    print(client_send(transactionRequest(
-        id, [], [tid_list[0], tid_list[1]], [tid_list[0], tid_list[1]])))
-    print(client_send(transactionRequest(
-        id, [], [tid_list[0], tid_list[1]], [])))
+    # print()
+    client_send(transactionRequest(
+        id, [], [tid_list[0], tid_list[1]], [tid_list[0], tid_list[1]]))
+    client_send(transactionRequest(
+        id, [], [tid_list[0], tid_list[1]], []))
+    # print()
 
 
 def serializeTest(number):
@@ -176,8 +183,8 @@ def concurrentTest(number):
 
 if __name__ == "__main__":
     start_time = time.time()
-    # serializeTest(4)
-    concurrentTest(10)
+    # serializeTest(100)
+    concurrentTest(100)
     end_time = time.time()
 
     print(f"Running time is {end_time - start_time}")
