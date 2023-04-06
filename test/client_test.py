@@ -165,7 +165,8 @@ def serializeTest(number):
 def concurrentTest(number):
     thread_list = list()
     for i in range(1, number+1):
-        t = threading.Thread(target=TestCreation, args=(i, number))
+        t = threading.Thread(target=TestCreation, args=(i, ))
+        # t = threading.Thread(target=TestQuery, args=(i,))
         t.start()
         thread_list.append(t)
 
@@ -175,10 +176,8 @@ def concurrentTest(number):
 
 if __name__ == "__main__":
     start_time = time.time()
-    serializeTest(4)
+    # serializeTest(4)
+    concurrentTest(10)
     end_time = time.time()
-    # start_time = time.time()
-    # concurrentTest(100)
-    # end_time = time.time()
 
     print(f"Running time is {end_time - start_time}")

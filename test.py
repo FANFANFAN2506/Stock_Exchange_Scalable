@@ -64,18 +64,18 @@ def testParseMatch():
     xmlString6 = "<transactions id=\"6\"><order sym=\"X\" amount=\"400\" limit=\"125\"/></transactions>"
     xmlString7 = "<transactions id=\"7\"><order sym=\"X\" amount=\"-400\" limit=\"124\"/></transactions>"
     print("Before matching:")
-    parsing_XML(session, xmlString)
-    parsing_XML(session, xmlString1)
-    parsing_XML(session, xmlString2)
-    parsing_XML(session, xmlString3)
-    parsing_XML(session, xmlString4)
-    parsing_XML(session, xmlString5)
-    parsing_XML(session, xmlString6)
+    parsing_XML(xmlString)
+    parsing_XML(xmlString1)
+    parsing_XML(xmlString2)
+    parsing_XML(xmlString3)
+    parsing_XML(xmlString4)
+    parsing_XML(xmlString5)
+    parsing_XML(xmlString6)
     printAccountPosition(engine)
     printOrderStatus(engine)
     print("New order:")
     print(xmlString7)
-    parsing_XML(session, xmlString7)
+    parsing_XML(xmlString7)
     print("After matching:")
     printAccountPosition(engine)
     printOrderStatus(engine)
@@ -94,7 +94,7 @@ def testParse():
     print("Request:")
     print(xmlString)
     print("Response:")
-    parsing_XML(session, xmlString)
+    parsing_XML(xmlString)
     print("")
     print("----Test 2 Failed: Query number and cancel number does not exist----")
     xmlString2 = "<create><account id=\"1\" balance=\"50000\"/><symbol sym=\"TESLA\"><account id=\"1\">500</account></symbol></create>"
@@ -103,8 +103,8 @@ def testParse():
     print(xmlString2)
     print(xmlString3)
     print("Response:")
-    parsing_XML(session, xmlString2)
-    parsing_XML(session, xmlString3)
+    parsing_XML(xmlString2)
+    parsing_XML(xmlString3)
     print("")
     print("----Test 3 Failed: Trasaciton account id doesn't exsit, transcation doesn't belong to account----")
     xmlString8 = "<transactions id=\"1000\"><order sym=\"TESLA\" amount=\"100\" limit=\"250\"/><query id=\"1\"/><cancel id=\"1\"/></transactions>"
@@ -113,8 +113,8 @@ def testParse():
     print(xmlString8)
     print(xmlString7)
     print("Response:")
-    parsing_XML(session, xmlString8)
-    parsing_XML(session, xmlString7)
+    parsing_XML(xmlString8)
+    parsing_XML(xmlString7)
     print("")
     print("----Test 4 Success: Open a order, query it, then delete it and query again----")
     xmlString4 = "<create><account id=\"2\" balance=\"50000\"/><symbol sym=\"TB\"><account id=\"2\">500</account></symbol></create>"
@@ -127,13 +127,13 @@ def testParse():
     # print(xmlString6)
     print(xmlString9)
     print("Response:")
-    parsing_XML(session, xmlString4)
-    parsing_XML(session, xmlString5)
+    parsing_XML(xmlString4)
+    parsing_XML(xmlString5)
     time.sleep(1)
-    # addStatus(session, 1, 'executed', 50, 250, getCurrentTime())
-    # parsing_XML(session, xmlString6)
+    # addStatus(  1, 'executed', 50, 250, getCurrentTime())
+    # parsing_XML(  xmlString6)
     time.sleep(1)
-    parsing_XML(session, xmlString9)
+    parsing_XML(xmlString9)
     session.close()
 
 
@@ -146,19 +146,19 @@ def testAdd():
     session = createEngine()
     try:
         print("----Test 1 Failed: Account exist----")
-        addAccount(session, 1, 100000)
-        addAccount(session, 1, 200)
+        addAccount(1, 100000)
+        addAccount(1, 200)
     except Exception as e:
         print(e)
 
     print("")
     try:
         print("----Test 2 Failed: Balance not sufficient----")
-        addPosition(session, 1, 'T5asdf', 200)
-        addPosition(session, 1, 'T5asdf', 300)
-        addTranscation(session, 1, 'T5asdf', 400, 125)
-        addTranscation(session, 1, 'T5asdf', 400, 125)
-        addTranscation(session, 1, 'T5asdf', 200, 125)
+        addPosition(1, 'T5asdf', 200)
+        addPosition(1, 'T5asdf', 300)
+        addTranscation(1, 'T5asdf', 400, 125)
+        addTranscation(1, 'T5asdf', 400, 125)
+        addTranscation(1, 'T5asdf', 200, 125)
 
     except Exception as e:
         print(e)
@@ -166,18 +166,35 @@ def testAdd():
     print("")
     try:
         print("----Test 3 Failed: Amount not sufficient----")
-        addAccount(session, 2, 200)
-        addPosition(session, 2, 'T5asdf', 200)
-        addTranscation(session, 2, 'T5asdf', -400, 125)
+        addAccount(2, 200)
+        addPosition(2, 'T5asdf', 200)
+        addTranscation(2, 'T5asdf', -400, 125)
     except Exception as e:
         print(e)
     try:
-        addPosition(session, 1, 'S&P', 300)
-        addPosition(session, 1, 'BTC', 100)
-        addStatus(session, 1, 'executed', 100, 100, getCurrentTime())
+        addPosition(1, 'S&P', 300)
+        addPosition(1, 'BTC', 100)
+        addStatus(1, 'executed', 100, 100, getCurrentTime())
     except Exception as e:
         print(e)
     session.close()
+
+
+def testCancel():
+    xmlString4 = "<create><account id=\"2\" balance=\"50000\"/><symbol sym=\"TB\"><account id=\"2\">500</account></symbol></create>"
+    xmlString5 = "<transactions id=\"2\"><order sym=\"TESLA\" amount=\"100\" limit=\"250\"/><order sym=\"TB\" amount=\"-100\" limit=\"120\"/><query id=\"1\"/><query id=\"2\"/></transactions>"
+    xmlString6 = "<transactions id=\"2\"><cancel id=\"1\"/><cancel id=\"2\"/><query id=\"1\"/></transactions>"
+    xmlString9 = "<transactions id=\"2\"><cancel id=\"1\"/><cancel id=\"2\"/><query id=\"1\"/><query id=\"2\"/></transactions>"
+    print("Request:")
+    print(xmlString4)
+    print(xmlString5)
+    print(xmlString6)
+    print(xmlString9)
+    print("Response:")
+    parsing_XML(xmlString4)
+    parsing_XML(xmlString5)
+    parsing_XML(xmlString6)
+    parsing_XML(xmlString9)
 
 
 def testSocket():
@@ -191,6 +208,7 @@ def main():
     # testAdd()
     # testParseMatch()
     testSocket()
+    # testCancel()
 
 
 if __name__ == '__main__':
